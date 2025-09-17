@@ -1,33 +1,66 @@
+import { colors } from '@/constants/colors';
+import Ionicons from '@expo/vector-icons/Ionicons';
+import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 import { Tabs } from 'expo-router';
 import React from 'react';
 
-import { HapticTab } from '@/components/haptic-tab';
-import { IconSymbol } from '@/components/ui/icon-symbol';
-import { Colors } from '@/constants/theme';
-import { useColorScheme } from '@/hooks/use-color-scheme';
-
 export default function TabLayout() {
-  const colorScheme = useColorScheme();
-
   return (
     <Tabs
       screenOptions={{
-        tabBarActiveTintColor: Colors[colorScheme ?? 'light'].tint,
+        tabBarActiveTintColor: colors.MAIN,
         headerShown: false,
-        tabBarButton: HapticTab,
       }}>
       <Tabs.Screen
         name="index"
         options={{
-          title: 'Home',
-          tabBarIcon: ({ color }) => <IconSymbol size={28} name="house.fill" color={color} />,
+          title: '홈',
+          tabBarIcon: ({ color, focused }) => (
+            <Ionicons
+              name={focused ? "home-sharp" : "home-outline"}
+              size={25}
+              color={color}
+            />
+          ),
         }}
       />
       <Tabs.Screen
-        name="explore"
+        name="quiz"
         options={{
-          title: 'Explore',
-          tabBarIcon: ({ color }) => <IconSymbol size={28} name="paperplane.fill" color={color} />,
+          title: '퀴즈',
+          tabBarIcon: ({ color, focused }) => (
+            <MaterialCommunityIcons 
+              name={focused ? "lightbulb-question" : "lightbulb-question-outline"}
+              size={25}
+              color={color}
+            />
+          )
+        }}
+      />
+      <Tabs.Screen
+        name="memory"
+        options={{
+          title: '메모리',
+          tabBarIcon: ({ color, focused }) => (
+            <Ionicons
+              name={focused ? "document-text" : "document-text-outline"}
+              size={25}
+              color={color}
+            />
+          )
+        }}
+      />
+      <Tabs.Screen
+        name="my"
+        options={{
+          title: '내 프로필',
+          tabBarIcon: ({ color, focused }) => (
+            <Ionicons
+              name={focused ? "person-circle" : "person-circle-outline"}
+              size={25}
+              color={color}
+            />
+          )
         }}
       />
     </Tabs>
