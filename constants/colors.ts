@@ -1,9 +1,11 @@
 const colors = {
-  MAIN: "#6FB34D",
+  MAIN: "#43921C",
   BG: "#FAFAFA",
   WHITE: "#FFF",
   ORANGE_600: "#FF6B57",
   BLACK: "#000",
+  BLACKTEXT: "#282828",
+  TEXT: "#394050",
   GRAY_100: "#F3F4F6",
   GRAY_200: "#E5E7EA",
   GRAY_300: "#D2D5DB",
