@@ -57,7 +57,7 @@ export const typography = {
   B1_BOLD: {
     fontSize: 18,
     lineHeight: 24,
-    fontWeight: '500' as TextStyle['fontWeight'],
+    fontWeight: '600' as TextStyle['fontWeight'],
     letterSpacing: 0,
   },
   B2: {
@@ -69,7 +69,7 @@ export const typography = {
   B2_BOLD: {
     fontSize: 16,
     lineHeight: 20,
-    fontWeight: '500' as TextStyle['fontWeight'],
+    fontWeight: '600' as TextStyle['fontWeight'],
     letterSpacing: 0,
   },
 
