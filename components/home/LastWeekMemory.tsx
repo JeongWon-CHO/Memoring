@@ -16,7 +16,8 @@ import {
 } from 'react-native';
 
 const { width: screenWidth } = Dimensions.get('window');
-const CARD_WIDTH = screenWidth * 0.7;
+const CONTAINER_PADDING = 40; // marginHorizontal 20 * 2
+const CARD_WIDTH = (screenWidth - CONTAINER_PADDING) * 0.65;
 const CARD_HEIGHT = CARD_WIDTH * (4 / 3); // 3:4 비율
 
 export default function LastWeekMemory() {
@@ -180,21 +181,21 @@ export default function LastWeekMemory() {
 
     const scale = translateX.interpolate({
       inputRange: [-screenWidth, -screenWidth/2, 0, screenWidth/2, screenWidth],
-      outputRange: position === -2 ? [0.75, 0.72, 0.7, 0.73, 0.78] :
-                    position === -1 ? [0.88, 0.84, 0.8, 0.85, 0.92] :
-                    position === 0 ? [1.1, 1.05, 1, 0.95, 0.88] :
-                    position === 1 ? [0.98, 0.94, 0.9, 0.86, 0.8] :
-                    position === 2 ? [0.85, 0.82, 0.8, 0.77, 0.73] : [0.7, 0.7, 0.7, 0.7, 0.7],
+      outputRange: position === -2 ? [0.78, 0.76, 0.75, 0.77, 0.8] :
+                    position === -1 ? [0.9, 0.87, 0.85, 0.88, 0.92] :
+                    position === 0 ? [1.05, 1.02, 1, 0.98, 0.95] :
+                    position === 1 ? [0.92, 0.9, 0.88, 0.86, 0.84] :
+                    position === 2 ? [0.82, 0.8, 0.78, 0.76, 0.74] : [0.7, 0.7, 0.7, 0.7, 0.7],
       extrapolate: 'clamp',
     });
 
     const translateXCard = translateX.interpolate({
       inputRange: [-screenWidth, -screenWidth/2, 0, screenWidth/2, screenWidth],
-      outputRange: position === -2 ? [-180, -160, -140, -120, -100] :
-                    position === -1 ? [-120, -100, -80, -60, -40] :
-                    position === 0 ? [-60, -30, 0, 30, 60] :
-                    position === 1 ? [0, 20, 40, 60, 80] :
-                    position === 2 ? [40, 60, 80, 100, 120] : [0, 0, 0, 0, 0],
+      outputRange: position === -2 ? [-70, -65, -80, -55, -50] :
+                    position === -1 ? [-45, -40, -45, -30, -25] :
+                    position === 0 ? [-30, -15, 0, 15, 30] :
+                    position === 1 ? [0, 12, 45, 37, 50] :
+                    position === 2 ? [25, 37, 80, 62, 75] : [0, 0, 0, 0, 0],
       extrapolate: 'clamp',
     });
 
@@ -218,11 +219,11 @@ export default function LastWeekMemory() {
 
     const opacity = translateX.interpolate({
       inputRange: [-screenWidth, -screenWidth/2, 0, screenWidth/2, screenWidth],
-      outputRange: position === -2 ? [0.8, 0.7, 0.6, 0.5, 0.4] :
-                    position === -1 ? [0.95, 0.9, 0.85, 0.75, 0.6] :
-                    position === 0 ? [1, 1, 1, 0.95, 0.85] :
-                    position === 1 ? [1, 0.98, 0.95, 0.9, 0.8] :
-                    position === 2 ? [0.85, 0.8, 0.7, 0.65, 0.55] :
+      outputRange: position === -2 ? [0.85, 0.8, 0.75, 0.7, 0.65] :
+                    position === -1 ? [0.95, 0.92, 0.9, 0.85, 0.8] :
+                    position === 0 ? [1, 1, 1, 1, 0.95] :
+                    position === 1 ? [1, 0.98, 0.95, 0.92, 0.9] :
+                    position === 2 ? [0.9, 0.85, 0.8, 0.75, 0.7] :
                     position < -2 ? [0, 0, 0, 0, 0] : [1, 1, 1, 1, 1],
       extrapolate: 'clamp',
     });
@@ -253,7 +254,8 @@ export default function LastWeekMemory() {
     <View style={styles.container}>
       <Text style={[typography.B1_BOLD, styles.title]}>지난주 메모리</Text>
 
-      <View style={styles.carouselContainer} {...panResponder.panHandlers}>
+      <View style={styles.carouselWrapper}>
+        <View style={styles.carouselContainer} {...panResponder.panHandlers}>
         <View style={styles.cardsWrapper}>
           {memories.map((memory, index) => {
             const cardStyle = getCardStyle(index);
@@ -319,6 +321,7 @@ export default function LastWeekMemory() {
           </TouchableOpacity>
         )}
       </View>
+      </View>
 
       {/* Pagination dots */}
       <View style={styles.pagination}>
@@ -339,18 +342,33 @@ export default function LastWeekMemory() {
 const styles = StyleSheet.create({
   container: {
     marginBottom: 24,
+    backgroundColor: colors.WHITE,
+    borderRadius: 12,
+    marginHorizontal: 20,
+    paddingVertical: 24,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.05,
+    shadowRadius: 3,
+    elevation: 2,
   },
   title: {
     color: colors.BLACKTEXT,
     marginBottom: 16,
     marginHorizontal: 20,
+    textAlign: 'center',
+  },
+  carouselWrapper: {
+    overflow: 'hidden', // container 밖으로 나가지 않도록
   },
   carouselContainer: {
     height: CARD_HEIGHT + 50,
     position: 'relative',
     overflow: 'visible',
-    // marginLeft: -20, // 왼쪽으로 더 나가도록
-
+    
   },
   cardsWrapper: {
     flex: 1,
@@ -360,31 +378,31 @@ const styles = StyleSheet.create({
     position: 'absolute',
     width: CARD_WIDTH,
     height: CARD_HEIGHT,
-    left: 60, // 왼쪽 시작점 - 이전 카드가 더 보이도록 조정
+    left: ((screenWidth - CONTAINER_PADDING) - CARD_WIDTH) / 2, // 컨테이너 중앙
     top: 20,
   },
   prevCard2: {
     transform: [
-      { scale: 0.7 },
-      { translateX: -140 },
+      { scale: 0.6 },
+      { translateX: -60 },
     ],
   },
   prevCard1: {
     transform: [
-      { scale: 0.8 },
-      { translateX: -80 },
+      { scale: 0.85 },
+      { translateX: -35 },
     ],
   },
   bottomCard: {
     transform: [
-      { scale: 0.8 },
-      { translateX: 80 },
+      { scale: 0.7 },
+      { translateX: 50 },
     ],
   },
   middleCard: {
     transform: [
-      { scale: 0.9 },
-      { translateX: 40 },
+      { scale: 0.88 },
+      { translateX: 25 },
     ],
   },
   activeCard: {
@@ -449,7 +467,7 @@ const styles = StyleSheet.create({
   },
   navButton: {
     position: 'absolute',
-    top: '40%',
+    top: CARD_HEIGHT / 2,
     backgroundColor: colors.WHITE,
     borderRadius: 20,
     width: 40,
@@ -467,16 +485,17 @@ const styles = StyleSheet.create({
     zIndex: 10,
   },
   prevButton: {
-    left: 10,
+    left: 20,
   },
   nextButton: {
-    right: 10,
+    right: 20,
   },
   pagination: {
     flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
-    paddingTop: 16,
+    paddingTop: 8,
+    marginHorizontal: 20,
   },
   dot: {
     width: 8,
