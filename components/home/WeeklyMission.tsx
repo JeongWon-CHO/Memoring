@@ -1,5 +1,6 @@
 import { colors } from '@/constants/colors';
 import { Ionicons } from '@expo/vector-icons';
+import { router } from 'expo-router';
 import React from 'react';
 import {
   ScrollView,
@@ -26,7 +27,10 @@ export default function WeeklyMission() {
           <Text style={styles.emptyDescription}>
             새로운 미션을 등록해주세요!
           </Text>
-          <TouchableOpacity style={styles.addButton}>
+          <TouchableOpacity
+            style={styles.addButton}
+            onPress={() => router.push('/mission/select')}
+          >
             <Text style={styles.addButtonText}>등록하기</Text>
           </TouchableOpacity>
         </View>

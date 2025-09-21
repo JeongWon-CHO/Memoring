@@ -1,10 +1,11 @@
 // import { useFonts } from 'expo-font';
 import { Stack } from 'expo-router';
-import 'react-native-reanimated';
-import { SafeAreaProvider } from 'react-native-safe-area-context';
 import * as SplashScreen from 'expo-splash-screen';
 import { useEffect, useState } from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import { StyleSheet, Text, View } from 'react-native';
+import 'react-native-reanimated';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 SplashScreen.preventAutoHideAsync();
 
@@ -41,13 +42,16 @@ export default function RootLayout() {
   }
 
   return (
-    <SafeAreaProvider>
-      <Stack initialRouteName="auth">
-          <Stack.Screen name="auth" options={{ headerShown: false }}  />
-          <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-          <Stack.Screen name="+not-found" />
-        </Stack>
-    </SafeAreaProvider>
+    <GestureHandlerRootView style={{ flex: 1 }}>
+      <SafeAreaProvider>
+        <Stack initialRouteName="auth">
+            <Stack.Screen name="auth" options={{ headerShown: false }}  />
+            <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+            <Stack.Screen name="mission" options={{ headerShown: false }} />
+            <Stack.Screen name="+not-found" />
+          </Stack>
+      </SafeAreaProvider>
+    </GestureHandlerRootView>
   );
 }
 
