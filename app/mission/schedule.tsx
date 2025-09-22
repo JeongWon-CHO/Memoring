@@ -13,12 +13,13 @@ import {
   View,
 } from 'react-native';
 import { ScrollView as GestureScrollView } from 'react-native-gesture-handler';
+import { patchMissionSchedule } from '../api/mission';
 
 const DAYS = ['일', '월', '화', '수', '목', '금', '토'];
 
 export default function MissionScheduleScreen() {
   const params = useLocalSearchParams();
-  const { missionId, missionText } = params;
+  const { missionId, missionText, serverMissionId } = params;
 
   // 현재 날짜 기준으로 한 주 생성
   const today = new Date();
@@ -34,6 +35,33 @@ export default function MissionScheduleScreen() {
   // 알림 설정 상태
   const [notificationTime, setNotificationTime] = useState('1시간 전');
   const [isNotificationDropdownOpen, setIsNotificationDropdownOpen] = useState(false);
+
+  // 오프셋 포함 ISO 생성 유틸
+  const toOffsetISOString = (d: Date) => {
+    const pad = (n: number) => String(n).padStart(2, '0');
+    const yyyy = d.getFullYear();
+    const MM = pad(d.getMonth() + 1);
+    const dd = pad(d.getDate());
+    const hh = pad(d.getHours());
+    const mm = pad(d.getMinutes());
+    const ss = pad(d.getSeconds());
+
+    const offsetMin = -d.getTimezoneOffset();      // e.g. KST = +540
+    const sign = offsetMin >= 0 ? '+' : '-';
+    const oh = pad(Math.floor(Math.abs(offsetMin) / 60));
+    const om = pad(Math.abs(offsetMin) % 60);
+
+    return `${yyyy}-${MM}-${dd}T${hh}:${mm}:${ss}${sign}${oh}:${om}`;
+  };
+
+  const alarmOffsetMap: Record<string, number> = {
+    '정시': 0,
+    '5분 전': 5,
+    '10분 전': 10,
+    '15분 전': 15,
+    '30분 전': 30,
+    '1시간 전': 60,
+  };
 
   const notificationOptions = [
     '정시',
@@ -60,21 +88,40 @@ export default function MissionScheduleScreen() {
 
   const weekDates = getWeekDates();
 
-  const handleNext = () => {
-    // 선택한 일정 정보를 가지고 녹음 화면으로 이동
-    const selectedDate = new Date();
-    selectedDate.setDate(selectedDate.getDate() + (selectedDay - currentDay));
-    selectedDate.setHours(selectedHour, selectedMinute, 0, 0);
+  const handleNext = async () => {
+    const base = new Date();
+    base.setDate(base.getDate() + (selectedDay - currentDay));
+    base.setHours(selectedHour, selectedMinute, 0, 0);
 
-    router.push({
-      pathname: '/mission/record',
-      params: {
-        missionId,
-        missionText,
-        scheduledDate: selectedDate.toISOString(),
-        notificationTime,
-      },
-    });
+    const scheduledAt = toOffsetISOString(base);
+    const alarmOffset = alarmOffsetMap[notificationTime] ?? 0;
+
+    // 주의: 아래 missionId는 user_mission_id 여야 함!
+    //  - 미션 선택 API(POST /missions/select/) 응답의 id를 이전 화면에서 params로 넘겨주세요.
+    //  - 후보 id를 그대로 넘기면 404/400 날 수 있어요.
+    const userMissionId = Number(serverMissionId);
+
+    try {
+      const res = await patchMissionSchedule(userMissionId, {
+        scheduled_at: scheduledAt,
+        alarm_offset_minutes: alarmOffset,
+      });
+
+      // 성공 후 다음 페이지로 이동
+      router.push({
+        pathname: '/mission/record', // 실제 녹음 화면 경로
+        params: {
+          missionId: String(userMissionId),
+          // serverMissionId: String(userMissionId),
+          missionText,
+          scheduledDate: scheduledAt,
+          notificationTime,
+        },
+      });
+    } catch (e: any) {
+      console.log('스케줄 저장 실패', e?.response?.data || e);
+      alert('스케줄 저장에 실패했습니다. 날짜/시간 형식을 다시 확인해주세요.');
+    }
   };
 
   return (
