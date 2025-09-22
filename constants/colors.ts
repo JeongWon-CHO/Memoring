@@ -16,6 +16,7 @@ const colors = {
   GRAY_800: "#212936",
   GRAY_900: "#131927",
   ACCENT: "#CC521E",
+  TEXT_2: "#6D717F",
 };
 
 export { colors };
