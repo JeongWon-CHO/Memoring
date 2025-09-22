@@ -3,6 +3,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import React, { useState } from 'react';
 import {
+  Alert,
   Keyboard,
   KeyboardAvoidingView,
   Platform,
@@ -14,18 +15,50 @@ import {
   View
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { postLogin } from '@/app/api/login';
+import * as SecureStore from 'expo-secure-store';
 
 export default function LoginScreen() {
   const [id, setId] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [autoLogin, setAutoLogin] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
-  const handleLogin = () => {
-    // TODO: 실제 로그인 로직 구현
-    console.log('로그인 시도:', { id, password, autoLogin });
-    // 로그인 성공 시 메인 화면으로 이동
-    router.replace('/(tabs)');
+  const handleLogin = async () => {
+    if (!id || !password) {
+      Alert.alert('알림', '아이디와 비밀번호를 입력해주세요.');
+      return;
+    }
+
+    setIsLoading(true);
+
+    try {
+      const response = await postLogin({
+        id,
+        password,
+      });
+
+      // 자동 로그인 설정 저장
+      if (autoLogin) {
+        await SecureStore.setItemAsync('autoLogin', 'true');
+        await SecureStore.setItemAsync('userId', id);
+      }
+
+      // 로그인 성공 시 메인 화면으로 이동
+      router.replace('/(tabs)');
+    } catch (error: any) {
+      console.error('Login error:', error);
+      if (error.status === 401) {
+        Alert.alert('로그인 실패', '아이디 또는 비밀번호가 일치하지 않습니다.');
+      } else if (error.status === 404) {
+        Alert.alert('로그인 실패', '존재하지 않는 계정입니다.');
+      } else {
+        Alert.alert('로그인 실패', '로그인에 실패했습니다. 다시 시도해주세요.');
+      }
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const handleSignup = () => {
@@ -103,11 +136,12 @@ export default function LoginScreen() {
 
               {/* Login Button */}
               <TouchableOpacity
-                style={styles.loginButton}
+                style={[styles.loginButton, isLoading && styles.disabledButton]}
                 onPress={handleLogin}
                 activeOpacity={0.8}
+                disabled={isLoading}
               >
-                <Text style={styles.loginButtonText}>로그인</Text>
+                <Text style={styles.loginButtonText}>{isLoading ? '로그인 중...' : '로그인'}</Text>
               </TouchableOpacity>
 
               {/* Links */}
@@ -274,6 +308,9 @@ const styles = StyleSheet.create({
     color: colors.WHITE,
     fontSize: 18,
     fontWeight: '600',
+  },
+  disabledButton: {
+    opacity: 0.6,
   },
   linksContainer: {
     flexDirection: 'row',
