@@ -2,8 +2,8 @@ import Header from '@/components/common/Header';
 import MissionCard from '@/components/mission/MissionCard';
 import { colors } from '@/constants/colors';
 import { typography } from '@/constants/typography';
-import { useMissionStorage } from '@/hooks/useMissionStorage';
 import Ionicons from '@expo/vector-icons/Ionicons';
+import { Audio } from 'expo-av';
 import { router, useLocalSearchParams } from 'expo-router';
 import React, { useEffect, useRef, useState } from 'react';
 import {
@@ -11,129 +11,195 @@ import {
   StyleSheet,
   Text,
   TouchableOpacity,
-  View,
+  View
 } from 'react-native';
+import { getPlayRecord, postUploadRecord } from '../api/mission';
 
 export default function MissionRecordScreen() {
-  const params = useLocalSearchParams();
-  const { missionId, missionText, scheduledDate, notificationTime } = params;
-  const { saveMission } = useMissionStorage();
+  const getParam = (v: any) => (Array.isArray(v) ? v[0] : v);
 
-  // 타이머 상태
-  const [seconds, setSeconds] = useState(0);
+  const params = useLocalSearchParams();
+  // const { missionId, missionText, serverMissionId, notificationTime } = params;
+  const missionText = getParam(params.missionText);
+  const scheduledDateStr = getParam(params.scheduledDate) as string | undefined;
+  const serverMissionIdStr = getParam(params.missionId);
+  const serverMissionIdNum = Number(serverMissionIdStr);
+
+  if (!Number.isFinite(serverMissionIdNum)) {
+    console.warn('invalid serverMissionId:', serverMissionIdStr);
+  }
+
+  const [recording, setRecording] = useState<Audio.Recording | null>(null);
+  // const [serverVoiceUrl, setServerVoiceUrl] = useState<string | null>(null);
+  // const [sound, setSound] = useState<Audio.Sound | null>(null);
+  // const [isUploading, setIsUploading] = useState(false);
+  
+  // const [recording, setRecording] = useState<Audio.Recording | null>(null);
   const [isRecording, setIsRecording] = useState(false);
   const [isPaused, setIsPaused] = useState(false);
+  const [seconds, setSeconds] = useState(0);
+  const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const [isSaving, setIsSaving] = useState(false);
-  const intervalRef = useRef<NodeJS.Timeout | null>(null);
+  const [serverVoiceUrl, setServerVoiceUrl] = useState<string | null>(null);
 
-  // 타이머 포맷팅 (MM:SS)
-  const formatTime = (totalSeconds: number) => {
-    const mins = Math.floor(totalSeconds / 60);
-    const secs = totalSeconds % 60;
-    return `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
+  useEffect(() => {
+      (async () => {
+        const { status } = await Audio.requestPermissionsAsync();
+        if (status !== "granted") {
+          Alert.alert("마이크 권한이 필요합니다.");
+        }
+        await Audio.setAudioModeAsync({
+          allowsRecordingIOS: true,
+          playsInSilentModeIOS: true,
+        });
+  
+        // 서버에서 기존 녹음 파일 URL 가져오기
+        try {
+          const response = await getPlayRecord(serverMissionIdNum);
+          if (response.voice_url) {
+            setServerVoiceUrl(response.voice_url);
+          }
+        } catch (error) {
+          console.log("기존 녹음이 없습니다.");
+        }
+      })();
+    }, []);
+
+  
+  // 타이머 시작
+  const startTimer = () => {
+    if (timerRef.current) clearInterval(timerRef.current);
+    timerRef.current = setInterval(() => setSeconds(s => s + 1), 1000);
+  };
+
+  // 타이머 끝
+  const stopTimer = () => {
+    if (timerRef.current) {
+      clearInterval(timerRef.current);
+      timerRef.current = null;
+    }
   };
 
   // 녹음 시작
-  const startRecording = () => {
-    setIsRecording(true);
-    setIsPaused(false);
-    intervalRef.current = setInterval(() => {
-      setSeconds(prev => prev + 1);
-    }, 1000);
-  };
-
-  // 녹음 일시정지
-  const pauseRecording = () => {
-    setIsPaused(true);
-    if (intervalRef.current) {
-      clearInterval(intervalRef.current);
-    }
-  };
-
-  // 녹음 재개
-  const resumeRecording = () => {
-    setIsPaused(false);
-    intervalRef.current = setInterval(() => {
-      setSeconds(prev => prev + 1);
-    }, 1000);
-  };
-
-  // 녹음 중지 및 저장
-  const stopRecording = () => {
-    setIsRecording(false);
-    setIsPaused(false);
-    if (intervalRef.current) {
-      clearInterval(intervalRef.current);
-    }
-    // 저장 로직 처리 후 다음 화면으로 이동
-    handleSave();
-  };
-
-  // 다시 녹음
-  const resetRecording = () => {
-    setSeconds(0);
-    setIsRecording(false);
-    setIsPaused(false);
-    if (intervalRef.current) {
-      clearInterval(intervalRef.current);
-    }
-  };
-
-  // 저장하기
-  const handleSave = async () => {
-    if (isSaving) return;
-
-    setIsSaving(true);
+  const startRecording = async () => {
     try {
-      // 미션 저장
-      await saveMission({
-        missionText: missionText as string,
-        scheduledDate: scheduledDate as string,
-        isCompleted: false,
-        // recordingPath는 실제 녹음 기능 구현 시 추가
-      });
-
-      Alert.alert(
-        '저장 완료',
-        '미션이 저장되었습니다.',
-        [
-          {
-            text: '확인',
-            onPress: () => router.replace('/(tabs)'),
-          },
-        ]
+      console.log("녹음 시작");
+      const { recording } = await Audio.Recording.createAsync(
+        Audio.RecordingOptionsPresets.HIGH_QUALITY
       );
-    } catch (error) {
-      Alert.alert('저장 실패', '미션 저장에 실패했습니다.');
-      setIsSaving(false);
+      setRecording(recording);  // 얘만 원래 코드
+      setIsRecording(true);
+      setIsPaused(false);
+      setSeconds(0);
+      startTimer();
+    } catch (err) {
+      console.error("녹음 시작 실패", err);
     }
   };
 
-  // 컴포넌트 언마운트 시 타이머 정리
-  useEffect(() => {
-    return () => {
-      if (intervalRef.current) {
-        clearInterval(intervalRef.current);
+  // 일시정지
+  const togglePause = async () => {
+    if (!recording) return;
+    try {
+      if (isPaused) {
+        await recording.startAsync();
+        setIsPaused(false);
+        startTimer();
+      } else {
+        await recording.pauseAsync();
+        setIsPaused(true);
+        stopTimer();
       }
-    };
-  }, []);
-
-  // 요일과 시간 텍스트 가져오기
-  const getDayTimeText = () => {
-    if (!scheduledDate) return { day: '', time: '' };
-    const date = new Date(scheduledDate as string);
-    const days = ['일요일', '월요일', '화요일', '수요일', '목요일', '금요일', '토요일'];
-    const dayText = days[date.getDay()];
-
-    const hours = date.getHours();
-    const period = hours < 12 ? '오전' : '오후';
-    const displayHours = hours === 0 ? 12 : hours > 12 ? hours - 12 : hours;
-    const timeText = `${period} ${displayHours}시`;
-
-    return { day: dayText, time: timeText };
+    } catch (e) {
+      console.error('일시정지/재개 실패', e);
+    }
   };
 
-  const { day: dayText, time: timeText } = getDayTimeText();
+  // 다시녹음
+  const resetRecording = async () => {
+    stopTimer();
+    setSeconds(0);
+    setIsPaused(false);
+    setIsRecording(false);
+    if (recording) {
+      try { await recording.stopAndUnloadAsync(); } catch {}
+    }
+    setRecording(null);
+  };
+
+  // 녹음 중지 및 서버에 업로드
+  const stopRecording = async () => {
+    console.log("녹음 중지");
+    if (!recording) return;
+
+    try {
+    await recording.stopAndUnloadAsync();
+    stopTimer();
+
+    const cacheUri = recording.getURI();
+    if (!cacheUri) throw new Error('녹음 파일 경로를 찾을 수 없어요.');
+
+    const res = await postUploadRecord(serverMissionIdNum, cacheUri);
+    if (res?.voice_url) {
+      setServerVoiceUrl(res.voice_url);
+      Alert.alert('성공', '녹음이 성공적으로 업로드되었습니다.');
+    }
+    router.push({
+      pathname: '/', // 실제 녹음 화면 경로
+    });
+  } catch (e) {
+    console.error('업로드 실패', e);
+    Alert.alert('오류', '녹음 업로드에 실패했습니다.');
+  } finally {
+    setIsSaving(false);
+    setIsRecording(false);
+    setIsPaused(false);
+    setRecording(null);
+  }
+    // setIsUploading(true);
+    // await recording.stopAndUnloadAsync();
+    // const cacheUri = recording.getURI();
+
+    // if (cacheUri) {
+    //   try {
+    //     // 서버에 업로드
+    //     const response = await postUploadRecord(serverMissionIdNum, cacheUri);
+    //     console.log("녹음이 서버에 업로드되었습니다:", response);
+
+    //     // 업로드 성공 후 URL 저장
+    //     if (response.voice_url) {
+    //       setServerVoiceUrl(response.voice_url);
+    //       Alert.alert("성공", "녹음이 성공적으로 업로드되었습니다.");
+    //     }
+    //   } catch (error) {
+    //     console.error("업로드 실패:", error);
+    //     Alert.alert("오류", "녹음 업로드에 실패했습니다.");
+    //   }
+    // }
+
+    // setIsUploading(false);
+    // setRecording(null);
+  };
+
+  // 타이머 포맷팅 (MM:SS)
+  const formatTime = (t: number) =>
+    `${String(Math.floor(t / 60)).padStart(2, '0')}:${String(t % 60).padStart(2, '0')}`;
+
+  // 날짜 포맷팅
+  const formatDayTimeFromISO = (iso?: string) => {
+    if (!iso) return { day: '', time: '' };
+    const d = new Date(iso);
+
+    const day = `${d.getDate()}일`;
+    let hour = d.getHours();
+    const period = hour < 12 ? '오전' : '오후';
+    if (hour === 0) hour = 12;
+    else if (hour > 12) hour -= 12;
+
+    return { day, time: `${period} ${hour}시` };
+  };
+
+  const formattedDayTime = formatDayTimeFromISO(scheduledDateStr);
 
   return (
     <View style={styles.container}>
@@ -142,7 +208,7 @@ export default function MissionRecordScreen() {
       <View style={styles.content}>
         {/* 미션 텍스트 */}
         <MissionCard
-          dayTime={{ day: dayText, time: timeText }}
+          dayTime={{ day: formattedDayTime.day, time: formattedDayTime.time }}
           missionText={missionText as string}
           highlightDayTime={true}
         />
@@ -154,15 +220,7 @@ export default function MissionRecordScreen() {
           {/* 녹음 버튼 */}
           <TouchableOpacity
             style={styles.recordButton}
-            onPress={() => {
-              if (!isRecording) {
-                startRecording();
-              } else if (isPaused) {
-                resumeRecording();
-              } else {
-                pauseRecording();
-              }
-            }}
+            onPress={startRecording}
           >
             {!isRecording ? (
               <>
@@ -218,6 +276,7 @@ export default function MissionRecordScreen() {
       </View>
     </View>
   );
+
 }
 
 const styles = StyleSheet.create({
