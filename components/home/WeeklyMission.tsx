@@ -5,6 +5,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import React from 'react';
 import {
+  Alert,
   StyleSheet,
   Text,
   TouchableOpacity,
@@ -12,7 +13,7 @@ import {
 } from 'react-native';
 
 export default function WeeklyMission() {
-  const { getWeeklyMissions, loading } = useMissionStorage();
+  const { getWeeklyMissions, loading, deleteMission } = useMissionStorage();
   const weeklyMissions = getWeeklyMissions();
 
   // 오늘 날짜 체크 함수
@@ -26,11 +27,57 @@ export default function WeeklyMission() {
     );
   };
 
+  // 과거 날짜 체크 함수
+  const isPast = (dateString: string) => {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const missionDate = new Date(dateString);
+    missionDate.setHours(0, 0, 0, 0);
+    return missionDate < today;
+  };
+
+  // 미래 날짜 체크 함수
+  const isFuture = (dateString: string) => {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const missionDate = new Date(dateString);
+    missionDate.setHours(0, 0, 0, 0);
+    return missionDate > today;
+  };
+
   // 날짜 포맷팅
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
     const days = ['일', '월', '화', '수', '목', '금', '토'];
     return `${date.getMonth() + 1}/${date.getDate()}(${days[date.getDay()]})`;
+  };
+
+  // 포기하기 버튼 핸들러
+  const handleGiveUp = (missionId: string, missionDate: string) => {
+    const dateText = formatDate(missionDate);
+    const isPastMission = isPast(missionDate);
+
+    Alert.alert(
+      '미션 포기',
+      isPastMission
+        ? `${dateText} 미션을 포기하시겠습니까?\n지난 미션은 삭제됩니다.`
+        : '정말로 이 미션을 포기하시겠습니까?',
+      [
+        { text: '취소', style: 'cancel' },
+        {
+          text: '포기하기',
+          style: 'destructive',
+          onPress: async () => {
+            try {
+              await deleteMission(missionId);
+              Alert.alert('완료', '미션이 삭제되었습니다.');
+            } catch (error) {
+              Alert.alert('오류', '미션 삭제에 실패했습니다.');
+            }
+          }
+        }
+      ]
+    );
   };
 
   return (
@@ -58,52 +105,116 @@ export default function WeeklyMission() {
         <View style={styles.missionList}>
           {weeklyMissions.map((mission) => {
             const isTodayMission = isToday(mission.scheduledDate);
+            const isPastMission = isPast(mission.scheduledDate);
+            const isFutureMission = isFuture(mission.scheduledDate);
 
             return (
-              <View key={mission.id} style={styles.missionCard}>
+              <View
+                key={mission.id}
+                style={[
+                  styles.missionCard,
+                  isPastMission && styles.missionCardPast
+                ]}
+              >
                 <Text style={[typography.H4, styles.missionTitle]}>미션</Text>
 
-                <View style={styles.buttonsContainer}>
-                  <TouchableOpacity
-                    style={[
-                      styles.playButton,
-                      !isTodayMission && styles.playButtonDisabled
-                    ]}
-                    disabled={!isTodayMission}
-                  >
-                    <Ionicons name="headset" size={20} color={colors.WHITE} />
-                    <Text style={[typography.B2_BOLD, styles.playButtonText]}>
-                      미션듣기
+                {/* 오늘 미션인 경우 */}
+                {isTodayMission && (
+                  <>
+                    <View style={styles.buttonsContainer}>
+                      <TouchableOpacity
+                        style={styles.playButton}
+                      >
+                        <Ionicons name="headset" size={20} color={colors.WHITE} />
+                        <Text style={[typography.B2_BOLD, styles.playButtonText]}>
+                          미션듣기
+                        </Text>
+                      </TouchableOpacity>
+
+                      <TouchableOpacity
+                        style={styles.recordButton}
+                        onPress={() => {
+                          router.push({
+                            pathname: '/mission/record',
+                            params: {
+                              missionId: mission.id,
+                              missionText: mission.missionText,
+                              scheduledDate: mission.scheduledDate,
+                            }
+                          });
+                        }}
+                      >
+                        <Ionicons name="pencil" size={16} color={colors.MAIN} />
+                        <Text style={[typography.B2_BOLD, styles.recordButtonText]}>
+                          기록하기
+                        </Text>
+                      </TouchableOpacity>
+                    </View>
+
+                    <Text style={[typography.C1, styles.todayText]}>
+                      오늘의 미션
                     </Text>
-                  </TouchableOpacity>
+                  </>
+                )}
 
-                  {isTodayMission && (
-                    <TouchableOpacity
-                      style={styles.recordButton}
-                      onPress={() => {
-                        // 기록하기 화면으로 이동 (추후 구현)
-                      }}
-                    >
-                      <Ionicons name="pencil" size={16} color={colors.MAIN} />
-                      <Text style={[typography.B2_BOLD, styles.recordButtonText]}>
-                        기록하기
+                {/* 미래 미션인 경우 */}
+                {isFutureMission && (
+                  <>
+                    <View style={styles.buttonsContainer}>
+                      <TouchableOpacity
+                        style={[styles.playButton, styles.playButtonDisabled]}
+                        disabled={true}
+                      >
+                        <Ionicons name="headset" size={20} color={colors.WHITE} />
+                        <Text style={[typography.B2_BOLD, styles.playButtonText]}>
+                          미션듣기
+                        </Text>
+                      </TouchableOpacity>
+                    </View>
+
+                    <Text style={[typography.C1, styles.dateText]}>
+                      {formatDate(mission.scheduledDate)} 예정
+                    </Text>
+                  </>
+                )}
+
+                {/* 과거 미션인 경우 */}
+                {isPastMission && (
+                  <View style={styles.expiredDetailContainer}>
+                    <View style={styles.expiredContainer}>
+                      <Ionicons name="time-outline" size={20} color={colors.GRAY_500} />
+                      <Text style={[typography.B2, styles.expiredText]}>
+                        기간이 지난 미션
                       </Text>
-                    </TouchableOpacity>
-                  )}
-                </View>
+                    </View>
 
-                <TouchableOpacity style={styles.deleteButton}>
-                  <Ionicons name="close" size={18} color={colors.GRAY_500} />
-                  <Text style={[typography.C1, styles.deleteButtonText]}>
+                    <Text style={[typography.C1, styles.pastDateText]}>
+                      {formatDate(mission.scheduledDate)}
+                    </Text>
+                  </View>
+                )}
+
+                {/* 포기하기 버튼 */}
+                <TouchableOpacity
+                  style={[
+                    styles.deleteButton,
+                    isPastMission && styles.deleteButtonHighlighted
+                  ]}
+                  onPress={() => handleGiveUp(mission.id, mission.scheduledDate)}
+                >
+                  <Ionicons
+                    name="close"
+                    size={18}
+                    color={isPastMission ? colors.ORANGE_600 : colors.GRAY_500}
+                  />
+                  <Text style={[
+                    typography.C1,
+                    styles.deleteButtonText,
+                    isPastMission && styles.deleteButtonTextHighlighted
+                  ]}>
                     포기하기
                   </Text>
                 </TouchableOpacity>
-
-                {!isTodayMission && (
-                  <Text style={[typography.C1, styles.dateText]}>
-                    {formatDate(mission.scheduledDate)} 예정
-                  </Text>
-                )}
               </View>
             );
           })}
@@ -171,9 +282,26 @@ const styles = StyleSheet.create({
     color: colors.GRAY_600,
   },
   missionList: {
-    // flexGrow: 0,
+    // backgroundColor: colors.WHITE,
+    // borderRadius: 12,
+    // marginHorizontal: 20,
+    // shadowColor: '#000',
+    // shadowOffset: {
+    //   width: 0,
+    //   height: 2,
+    // },
+    // shadowOpacity: 0.05,
+    // shadowRadius: 3,
+    // elevation: 2,
+  },
+  missionListContent: {
+    // paddingHorizontal: 4,
+  },
+  missionCard: {
     backgroundColor: colors.WHITE,
     borderRadius: 12,
+    padding: 32,
+    alignItems: 'center',
     shadowColor: '#000',
     shadowOffset: {
       width: 0,
@@ -182,18 +310,6 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.05,
     shadowRadius: 3,
     elevation: 2,
-  },
-  missionListContent: {
-    // paddingHorizontal: 4,
-  },
-  missionCard: {
-    borderRadius: 16,
-    padding: 20,
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: 16,
-    minHeight: 200,
-    paddingVertical: 30,
   },
   missionTitle: {
     color: colors.BLACKTEXT,
@@ -240,7 +356,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 4,
-    marginTop: 12,
+    marginTop: 20,
   },
   deleteButtonText: {
     color: colors.GRAY_500,
@@ -248,5 +364,41 @@ const styles = StyleSheet.create({
   dateText: {
     color: colors.GRAY_500,
     marginTop: 8,
+  },
+  missionCardPast: {
+    backgroundColor: '#f8f8f8',
+  },
+  expiredDetailContainer: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: 12,
+  },
+  expiredContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+  },
+  expiredText: {
+    color: colors.GRAY_500,
+  },
+  pastDateText: {
+    color: colors.GRAY_400,
+    fontSize: 12,
+  },
+  todayText: {
+    color: colors.MAIN,
+    fontWeight: '600',
+  },
+  deleteButtonHighlighted: {
+    backgroundColor: '#fff3f0',
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 16,
+    borderWidth: 1,
+    borderColor: colors.ORANGE_600,
+  },
+  deleteButtonTextHighlighted: {
+    color: colors.ORANGE_600,
+    fontWeight: '600',
   },
 });
