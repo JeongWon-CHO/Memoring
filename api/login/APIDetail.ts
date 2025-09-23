@@ -1,4 +1,5 @@
 import { APIRequest, HTTP_METHOD } from "../APIRequest";
+import { APIResponse } from "../APIResponse";
 import { LoginRequest, LoginResponse, SignUpRequest, SignUpResponse, UserInfoResponse } from "./entity";
 
 // POST /user/signup/ (회원가입)
@@ -23,15 +24,17 @@ export class PostLogin implements APIRequest<LoginResponse> {
   constructor(public data: LoginRequest) { }
 }
 
+// /user/logout/
+export class PostLogout<R extends APIResponse> implements APIRequest<R> {
+  method = HTTP_METHOD.POST;
+  path = 'user/logout/';     // 끝에 슬래시 유지
+  response!: R;
+}
+
 // GET /user/me/ (내 정보)
 export class GetUserInfo<R extends UserInfoResponse> implements APIRequest<R> {
   method = HTTP_METHOD.GET;
   path = 'user/me/';
   response!: R;
   auth = true;
-
-  // authorization?: string;
-  // constructor(token?: string) {
-  //   this.authorization = token;
-  // }
 }
