@@ -132,7 +132,7 @@ export default function MissionSelectScreen() {
               <Text style={[typography.B2_BOLD, styles.moreButtonText]}>
                 다른 미션 보기
               </Text>
-              <Ionicons name="refresh-outline" size={20} color={colors.GRAY_500} />
+              <Ionicons name="refresh-outline" size={22} color={colors.GRAY_500} />
             </TouchableOpacity>
           </>
         )}
@@ -218,6 +218,7 @@ const styles = StyleSheet.create({
     marginTop: 32,
     paddingVertical: 12,
     paddingHorizontal: 24,
+    alignItems: 'center',
   },
   moreButtonText: {
     color: colors.GRAY_500,
