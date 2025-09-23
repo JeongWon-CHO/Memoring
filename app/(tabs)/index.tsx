@@ -4,7 +4,7 @@ import WeeklyMission from '@/components/home/WeeklyMission';
 import { colors } from '@/constants/colors';
 import { typography } from '@/constants/typography';
 import React, { useEffect, useState } from 'react';
-import { ScrollView, StyleSheet, Text, View } from 'react-native';
+import { Image, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { getUserMe } from '../../api/login';
 
@@ -37,7 +37,7 @@ export default function HomeScreen() {
       >
         {/* 헤더 */}
         <View style={styles.header}>
-          <Text style={[typography.H4, styles.logo]}>Memoring</Text>
+          <Image source={require('../../assets/images/MEMORING_TEXT.png')} style={styles.memoryLogo} />
         </View>
 
         {/* 1. 광고 배너 컴포넌트 */}
@@ -81,6 +81,9 @@ const styles = StyleSheet.create({
   header: {
     paddingVertical: 16,
     paddingHorizontal: 20,
+  },
+  memoryLogo: {
+    marginVertical: 16,
   },
   logo: {
     color: colors.BLACKTEXT,

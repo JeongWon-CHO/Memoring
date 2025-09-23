@@ -2,9 +2,9 @@
 import { Stack } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { useEffect, useState } from 'react';
-import { StyleSheet, Text, View } from 'react-native';
-import 'react-native-reanimated';
+import { Image, StyleSheet, View } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import 'react-native-reanimated';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 SplashScreen.preventAutoHideAsync();
@@ -36,7 +36,9 @@ export default function RootLayout() {
   if (!isReady) {
     return (
       <View style={styles.splashContainer}>
-        <Text style={styles.splashText}>Memoring</Text>
+        <View style={styles.logoSection}>
+          <Image source={require('../assets/images/MEMORING_LOGO.png')} />
+        </View>
       </View>
     );
   }
@@ -66,5 +68,10 @@ const styles = StyleSheet.create({
     fontSize: 48,
     fontWeight: 'bold',
     color: 'black',
+  },
+  logoSection: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
 });

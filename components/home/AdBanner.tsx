@@ -5,6 +5,7 @@ import React from 'react';
 import {
   Dimensions,
   Image,
+  ImageSourcePropType,
   Pressable,
   ScrollView,
   StyleSheet,
@@ -14,13 +15,17 @@ import {
 
 const { width: screenWidth } = Dimensions.get('window');
 
-export default function AdBanner() {
-  // TODO: 실제 광고 데이터는 API에서 가져오기
-  const ads = [
+type Ad = {
+  id: number;
+  title: string;
+  image?: ImageSourcePropType | null; // 로컬/원격 모두 커버
+};
+
+const ads: Ad[] = [
     {
       id: 1,
       title: '노인치매안심센터',
-      image: null, // 실제 이미지 URL
+      image: require('../../assets/images/CenterPhoto.png'), // 실제 이미지 URL
     },
     {
       id: 2,
@@ -34,6 +39,10 @@ export default function AdBanner() {
     },
   ];
 
+export default function AdBanner() {
+  // TODO: 실제 광고 데이터는 API에서 가져오기
+  
+
   return (
     <View style={styles.container}>
       <ScrollView
@@ -46,7 +55,7 @@ export default function AdBanner() {
           <View key={ad.id} style={styles.adCard}>
             <View style={styles.imageContainer}>
               {ad.image ? (
-                <Image source={{ uri: ad.image }} style={styles.adImage} />
+                <Image source={ad.image} style={styles.adImage} />
               ) : (
                 <View style={styles.placeholderImage}>
                   <Text style={styles.placeholderText}>광고 이미지</Text>
@@ -59,7 +68,7 @@ export default function AdBanner() {
                 end={{ x: 0, y: 1 }}
               >
                 <View style={styles.textOverlay}>
-                  <Text style={[typography.H5, styles.adTitle]}>{ad.title}</Text>
+                  <Text style={[typography.B2_BOLD, styles.adTitle]}>{ad.title}</Text>
                   <Pressable>
                     <Text style={[typography.C1, styles.adSubtitle]}>더보기 &gt; </Text>
                   </Pressable>

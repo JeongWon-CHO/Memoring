@@ -1,11 +1,13 @@
 import { postLogin } from '@/api/login';
 import { colors } from '@/constants/colors';
+import { typography } from '@/constants/typography';
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import * as SecureStore from 'expo-secure-store';
 import React, { useState } from 'react';
 import {
   Alert,
+  Image,
   Keyboard,
   KeyboardAvoidingView,
   Platform,
@@ -65,10 +67,10 @@ export default function LoginScreen() {
     router.push('/auth/signup');
   };
 
-  const handleSNSLogin = (provider: string) => {
-    console.log(`${provider} 로그인`);
-    // TODO: SNS 로그인 구현
-  };
+  // const handleSNSLogin = (provider: string) => {
+  //   console.log(`${provider} 로그인`);
+  //   // TODO: SNS 로그인 구현
+  // };
 
   return (
     <SafeAreaView style={styles.container}>
@@ -80,8 +82,7 @@ export default function LoginScreen() {
           <View style={styles.content}>
             {/* Logo Section */}
             <View style={styles.logoSection}>
-              <Text style={styles.logoTitle}>Memoring</Text>
-              <Text style={styles.logoSubtitle}>LOGO</Text>
+              <Image source={require('../../assets/images/MEMORING_LOGO.png')} />
             </View>
 
             {/* Login Form */}
@@ -198,7 +199,7 @@ export default function LoginScreen() {
 
               {/* Footer */}
               <TouchableOpacity style={styles.footer}>
-                <Text style={styles.footerText}>보호자 회원가입</Text>
+                <Text style={typography.C2}>보호자 회원가입</Text>
               </TouchableOpacity>
             </View>
           </View>
@@ -222,18 +223,8 @@ const styles = StyleSheet.create({
   },
   logoSection: {
     alignItems: 'center',
-    marginTop: 78,
-    marginBottom: 76,
-  },
-  logoTitle: {
-    fontSize: 32,
-    fontWeight: 'bold',
-    color: colors.BLACKTEXT,
-  },
-  logoSubtitle: {
-    fontSize: 18,
-    color: colors.BLACKTEXT,
-    marginTop: 4,
+    marginTop: 120,
+    marginBottom: 40,
   },
   form: {
     flex: 1,
@@ -248,7 +239,7 @@ const styles = StyleSheet.create({
     borderColor: colors.GRAY_200,
     borderRadius: 26,
     paddingHorizontal: 20,
-    fontSize: 16,
+    fontSize: 14,
     color: colors.BLACKTEXT,
     backgroundColor: colors.WHITE,
   },
@@ -262,7 +253,7 @@ const styles = StyleSheet.create({
     borderRadius: 26,
     paddingHorizontal: 20,
     paddingRight: 50,
-    fontSize: 16,
+    fontSize: 14,
     color: colors.BLACKTEXT,
     backgroundColor: colors.WHITE,
   },
@@ -337,50 +328,44 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: '600',
   },
-  snsSection: {
-    alignItems: 'center',
-    marginBottom: 30,
-  },
-  snsTitle: {
-    fontSize: 14,
-    color: colors.GRAY_500,
-    marginBottom: 20,
-  },
-  snsButtons: {
-    flexDirection: 'row',
-    gap: 20,
-  },
-  snsButton: {
-    marginHorizontal: 10,
-  },
-  snsIconWrapper: {
-    width: 48,
-    height: 48,
-    borderRadius: 24,
-    alignItems: 'center',
-    justifyContent: 'center',
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.1,
-    shadowRadius: 3,
-    elevation: 3,
-  },
+  // snsSection: {
+  //   alignItems: 'center',
+  //   marginBottom: 30,
+  // },
+  // snsTitle: {
+  //   fontSize: 14,
+  //   color: colors.GRAY_500,
+  //   marginBottom: 20,
+  // },
+  // snsButtons: {
+  //   flexDirection: 'row',
+  //   gap: 20,
+  // },
+  // snsButton: {
+  //   marginHorizontal: 10,
+  // },
+  // snsIconWrapper: {
+  //   width: 48,
+  //   height: 48,
+  //   borderRadius: 24,
+  //   alignItems: 'center',
+  //   justifyContent: 'center',
+  //   shadowColor: '#000',
+  //   shadowOffset: {
+  //     width: 0,
+  //     height: 2,
+  //   },
+  //   shadowOpacity: 0.1,
+  //   shadowRadius: 3,
+  //   elevation: 3,
+  // },
   footer: {
     alignItems: 'center',
-    marginTop: 90,
+    marginTop: 70,
     marginBottom: 30,
-    color: colors.TEXT,
-  },
-  footerText: {
-    fontSize: 16,
-    color: colors.BLACKTEXT,
-    fontWeight: '500',
   },
   SignUpUnderline: {
-    width: 70,
+    width: 80,
     height: 2,
     backgroundColor: colors.BLACKTEXT,
     marginTop: 2,
