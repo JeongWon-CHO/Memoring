@@ -13,7 +13,7 @@ import {
   TouchableOpacity,
   View
 } from 'react-native';
-import { getPlayRecord, postUploadRecord } from '../api/mission';
+import { getPlayRecord, postUploadRecord } from '../../api/mission';
 
 export default function MissionRecordScreen() {
   const getParam = (v: any) => (Array.isArray(v) ? v[0] : v);
@@ -80,14 +80,46 @@ export default function MissionRecordScreen() {
     }
   };
 
+  // // 녹음 시작
+  // const startRecording = async () => {
+  //   try {
+  //     console.log("녹음 시작");
+  //     const { recording } = await Audio.Recording.createAsync(
+  //       Audio.RecordingOptionsPresets.HIGH_QUALITY
+  //     );
+  //     setRecording(recording);  // 얘만 원래 코드
+  //     setIsRecording(true);
+  //     setIsPaused(false);
+  //     setSeconds(0);
+  //     startTimer();
+  //   } catch (err) {
+  //     console.error("녹음 시작 실패", err);
+  //   }
+  // };
+
   // 녹음 시작
   const startRecording = async () => {
     try {
-      console.log("녹음 시작");
-      const { recording } = await Audio.Recording.createAsync(
+      if (recording) {
+        if (isPaused) {
+          await recording.startAsync();
+          setIsPaused(false);
+          startTimer();
+        }
+        return;
+      }
+
+      console.log('녹음 시작');
+      await Audio.setAudioModeAsync({
+        allowsRecordingIOS: true,
+        playsInSilentModeIOS: true,
+      });
+
+      const { recording: rec } = await Audio.Recording.createAsync(
         Audio.RecordingOptionsPresets.HIGH_QUALITY
       );
-      setRecording(recording);  // 얘만 원래 코드
+
+      setRecording(rec);
       setIsRecording(true);
       setIsPaused(false);
       setSeconds(0);
@@ -220,7 +252,7 @@ export default function MissionRecordScreen() {
           {/* 녹음 버튼 */}
           <TouchableOpacity
             style={styles.recordButton}
-            onPress={startRecording}
+            onPress={!isRecording ? startRecording : togglePause}
           >
             {!isRecording ? (
               <>

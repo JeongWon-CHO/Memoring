@@ -3,13 +3,31 @@ import LastWeekMemory from '@/components/home/LastWeekMemory';
 import WeeklyMission from '@/components/home/WeeklyMission';
 import { colors } from '@/constants/colors';
 import { typography } from '@/constants/typography';
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { getUserMe } from '../../api/login';
 
 export default function HomeScreen() {
-  // TODO: 실제 사용자 이름은 로그인 정보에서 가져오기
-  const userName = '홍길동';
+  const [userName, setUserName] = useState<string>('');     // ← 서버 값
+  const [loadingUser, setLoadingUser] = useState<boolean>(true);
+
+  useEffect(() => {
+    let mounted = true;
+    (async () => {
+      try {
+        const res = await getUserMe();
+        if (mounted && res?.username) {
+          setUserName(res.username);
+        }
+      } catch (e) {
+        if (mounted) setUserName('사용자');
+      } finally {
+        if (mounted) setLoadingUser(false);
+      }
+    })();
+    return () => { mounted = false; };
+  }, []);
 
   return (
     <SafeAreaView style={styles.container} edges={['top']}>

@@ -1,4 +1,4 @@
-import { getCurrentMission, getPlayRecord } from '@/app/api/mission';
+import { getCurrentMission, getPlayRecord, postGiveUpMission } from '@/api/mission';
 import { colors } from '@/constants/colors';
 import { typography } from '@/constants/typography';
 import { Ionicons } from '@expo/vector-icons';
@@ -31,21 +31,15 @@ type WeeklyMissionItem = {
 };
 
 export default function WeeklyMission() {
-  // const { getWeeklyMissions, loading, deleteMission } = useMissionStorage();
-  // const weeklyMissions = getWeeklyMissions();
   const [current, setCurrent] = useState<CurrentMissionUI | null>(null);
   const [sound, setSound] = useState<Audio.Sound | null>(null);
   const [isLoadingAudio, setIsLoadingAudio] = useState(false);
-  // const [isPlaying, setIsPlaying] = useState(false);
   const [isPlaying, setIsPlaying] = useState<string | null>(null);
 
   const [weeklyMissions, setWeeklyMissions] = useState<WeeklyMissionItem[]>([]);
   const [loading, setLoading] = useState(true);
 
-  const toNumber = (v: unknown) => {
-    const n = typeof v === 'string' ? Number(v) : (v as number);
-    return Number.isFinite(n) ? n : NaN;
-  };
+  const [givingUpId, setGivingUpId] = useState<string | null>(null);
 
   // 언마운트 시 사운드 정리
   useEffect(() => {
@@ -74,13 +68,6 @@ export default function WeeklyMission() {
             completed: !!m.completed,
           };
           setWeeklyMissions([item]);
-          // setCurrent({
-          //   id: m.id,
-          //   title: m.title,
-          //   description: m.description,
-          //   scheduledAt: m.scheduled_at,
-          //   listenable: !!m.listenable, // 서버가 false면 재생 버튼 비활성화
-          // });
         } else {
           setCurrent(null);
           setWeeklyMissions([]);
@@ -132,10 +119,9 @@ export default function WeeklyMission() {
         playsInSilentModeIOS: true,
         shouldDuckAndroid: true,
         staysActiveInBackground: false,
-        // interruptionModeAndroid: Audio.INTERRUPTION_MODE_ANDROID_DO_NOT_MIX,
       });
 
-      const res = await getPlayRecord(mission.serverMissionId); // ★ user_mission_id 사용
+      const res = await getPlayRecord(mission.serverMissionId); // user_mission_id 사용
       console.log('[voice api resp]', JSON.stringify(res));
 
       const raw = (res as any).voice_url ?? (res as any).url ?? (res as any).voice;
@@ -145,40 +131,10 @@ export default function WeeklyMission() {
         return;
       }
 
-
-      
-      // // 1) 응답 구조 확인
-      // console.log('[voice api resp]', JSON.stringify(res));
-
-      // // 2) 키 이름이 다른지 대비
-      // const url = (res as any).voice_url ?? (res as any).url ?? (res as any).voice;
-      // if (!url || typeof url !== 'string') {
-      //   Alert.alert('알림', '아직 녹음된 미션이 없습니다.');
-      //   return;
-      // }
-
-      // // 3) 헤더 없이 접근 가능한지 사전 점검 (HEAD 요청)
-      // let headOk = false;
-      // try {
-      //   const head = await fetch(url, { method: 'HEAD' });
-      //   console.log('[voice HEAD]', head.status);
-      //   headOk = head.ok;
-      // } catch (e) {
-      //   console.log('[voice HEAD error]', e);
-      // }
-
-
-
-
-      // if (!res?.voice_url) {
-      //   Alert.alert('알림', '아직 녹음된 미션이 없습니다.');
-      //   return;
-      // }
-
       if (sound) await sound.unloadAsync();
 
       const { sound: newSound } = await Audio.Sound.createAsync(
-        { uri: absUrl },          // ★ 절대 URL 사용
+        { uri: absUrl },
         { shouldPlay: true }
       );
 
@@ -199,58 +155,48 @@ export default function WeeklyMission() {
       setIsLoadingAudio(false);
     }
   };
-  // // 미션 듣기 재생/정지 토글
-  // const toggleMissionPlayback = async (missionId: string) => {
-  //   // 재생 중인 경우 정지
-  //   if (isPlaying === missionId && sound) {
-  //     await sound.stopAsync();
-  //     await sound.unloadAsync();
-  //     setSound(null);
-  //     setIsPlaying(null);
-  //     return;
-  //   }
 
-  //   setIsLoadingAudio(true);
+  // 미션 포기
+  const giveUpMission = (mission: WeeklyMissionItem) => {
+    const dateText = formatDate(mission.scheduledDate);
 
-  //   try {
-  //     // 서버에서 녹음 파일 URL 가져오기
-  //     // 실제로는 missionId를 숫자로 변환해야 합니다
-  //     const missionIdNum = parseInt(missionId) || 42; // 테스트용 기본값
-  //     const response = await getPlayRecord(missionIdNum);
+    Alert.alert(
+      '미션 포기',
+      `${dateText} 미션을 포기하시겠습니까?`,
+      [
+        { text: '취소', style: 'cancel' },
+        {
+          text: '포기하기',
+          style: 'destructive',
+          onPress: async () => {
+            try {
+              setGivingUpId(mission.id);
 
-  //     if (!response.voice_url) {
-  //       Alert.alert('알림', '아직 녹음된 미션이 없습니다.');
-  //       return;
-  //     }
+              // 토큰이 필요하면 2번째 인자로 전달: postGiveUpMission(mission.serverMissionId, token)
+              const res = await postGiveUpMission(mission.serverMissionId);
 
-  //     // 기존 사운드가 있으면 정리
-  //     if (sound) {
-  //       await sound.unloadAsync();
-  //     }
+              // 성공 처리: 리스트에서 제거하거나 상태 갱신
+              setWeeklyMissions(prev => prev.filter(m => m.id !== mission.id));
 
-  //     // 새로운 재생 시작
-  //     const { sound: newSound } = await Audio.Sound.createAsync(
-  //       { uri: response.voice_url },
-  //       { shouldPlay: true }
-  //     );
-
-  //     setSound(newSound);
-  //     setIsPlaying(missionId);
-
-  //     // 재생 상태 업데이트
-  //     newSound.setOnPlaybackStatusUpdate((status) => {
-  //       if (!status.isLoaded) return;
-  //       if (status.didJustFinish) {
-  //         setIsPlaying(null);
-  //       }
-  //     });
-  //   } catch (error) {
-  //     console.error('재생 오류:', error);
-  //     Alert.alert('알림', '아직 녹음된 미션이 없습니다.');
-  //   } finally {
-  //     setIsLoadingAudio(false);
-  //   }
-  // };
+              Alert.alert('완료', '미션을 포기했습니다.');
+            } catch (e: any) {
+              const status = e?.response?.status;
+              if (status === 409) {
+                // 명세: 이미 완료된 현재 미션이면 409
+                Alert.alert('안내', '이미 완료된 미션입니다.');
+              } else if (status === 401 || status === 403) {
+                Alert.alert('안내', '로그인이 필요합니다.');
+              } else {
+                Alert.alert('오류', '미션 포기에 실패했습니다.');
+              }
+            } finally {
+              setGivingUpId(null);
+            }
+          }
+        }
+      ]
+    );
+  }
 
   // 오늘 날짜 체크 함수
   const isToday = (dateString: string) => {
@@ -287,34 +233,6 @@ export default function WeeklyMission() {
     const days = ['일', '월', '화', '수', '목', '금', '토'];
     return `${date.getMonth() + 1}/${date.getDate()}(${days[date.getDay()]})`;
   };
-
-  // 포기하기 버튼 핸들러
-  // const handleGiveUp = (missionId: string, missionDate: string) => {
-  //   const dateText = formatDate(missionDate);
-  //   const isPastMission = isPast(missionDate);
-
-  //   Alert.alert(
-  //     '미션 포기',
-  //     isPastMission
-  //       ? `${dateText} 미션을 포기하시겠습니까?\n지난 미션은 삭제됩니다.`
-  //       : '정말로 이 미션을 포기하시겠습니까?',
-  //     [
-  //       { text: '취소', style: 'cancel' },
-  //       {
-  //         text: '포기하기',
-  //         style: 'destructive',
-  //         onPress: async () => {
-  //           try {
-  //             await deleteMission(missionId);
-  //             Alert.alert('완료', '미션이 삭제되었습니다.');
-  //           } catch (error) {
-  //             Alert.alert('오류', '미션 삭제에 실패했습니다.');
-  //           }
-  //         }
-  //       }
-  //     ]
-  //   );
-  // };
 
   return (
     <View style={styles.container}>
@@ -404,12 +322,17 @@ export default function WeeklyMission() {
                   <View style={styles.expiredDetailContainer}>
                     <View style={styles.buttonsContainer}>
                       <TouchableOpacity
-                        style={[styles.playButton, styles.playButtonDisabled]}
-                        disabled={true}
+                        style={[
+                          styles.playButton,
+                          isPlaying === mission.id && styles.playButtonActive,
+                          isLoadingAudio && styles.playButtonDisabled
+                        ]}
+                        onPress={() => togglePlay(mission)}
+                        disabled={isLoadingAudio}
                       >
                         <Ionicons name="headset" size={20} color={colors.WHITE} />
                         <Text style={[typography.B2_BOLD, styles.playButtonText]}>
-                          미션듣기
+                          {isLoadingAudio ? '로딩...' : isPlaying === mission.id ? '정지' : '미션듣기'}
                         </Text>
                       </TouchableOpacity>
                     </View>
@@ -440,9 +363,10 @@ export default function WeeklyMission() {
                 <TouchableOpacity
                   style={[
                     styles.deleteButton,
-                    isPastMission && styles.deleteButtonHighlighted
+                    isPastMission && styles.deleteButtonHighlighted,
+                    (givingUpId === mission.id || (isTodayMission && mission.completed)) && { opacity: 0.6 }
                   ]}
-                  onPress={() => {}}
+                  onPress={() => giveUpMission(mission)}
                 >
                   <Ionicons
                     name="close"
@@ -524,20 +448,8 @@ const styles = StyleSheet.create({
     color: colors.GRAY_600,
   },
   missionList: {
-    // backgroundColor: colors.WHITE,
-    // borderRadius: 12,
-    // marginHorizontal: 20,
-    // shadowColor: '#000',
-    // shadowOffset: {
-    //   width: 0,
-    //   height: 2,
-    // },
-    // shadowOpacity: 0.05,
-    // shadowRadius: 3,
-    // elevation: 2,
   },
   missionListContent: {
-    // paddingHorizontal: 4,
   },
   missionCard: {
     backgroundColor: colors.WHITE,

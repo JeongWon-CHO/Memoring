@@ -1,4 +1,4 @@
-import { postSignup } from '@/app/api/login';
+import { postSignup } from '@/api/login';
 import Header from '@/components/common/Header';
 import { colors } from '@/constants/colors';
 import { typography } from '@/constants/typography';

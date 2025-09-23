@@ -26,3 +26,10 @@ export interface LoginRequest {
   id: string;
   password: string;
 }
+
+// 내 정보
+export interface UserInfoResponse extends APIResponse {
+  user_id: number;
+  username: string;
+  id: string;
+}

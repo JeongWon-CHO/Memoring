@@ -7,6 +7,7 @@ export default function MissionLayout() {
       <Stack.Screen name="select" />
       <Stack.Screen name="schedule" />
       <Stack.Screen name="record" />
+      <Stack.Screen name="test" />
     </Stack>
   );
 }

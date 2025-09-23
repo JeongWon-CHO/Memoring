@@ -1,5 +1,5 @@
-import { getMissionCandidates, postSelectMission } from '@/app/api/mission';
-import { MissionCandidate } from '@/app/api/mission/entity';
+import { getMissionCandidates, postSelectMission } from '@/api/mission';
+import { MissionCandidate } from '@/api/mission/entity';
 import Header from '@/components/common/Header';
 import { colors } from '@/constants/colors';
 import { typography } from '@/constants/typography';
@@ -7,13 +7,13 @@ import Ionicons from '@expo/vector-icons/Ionicons';
 import { router } from 'expo-router';
 import React, { useEffect, useState } from 'react';
 import {
-  ActivityIndicator,
-  Alert,
-  ScrollView,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
+    ActivityIndicator,
+    Alert,
+    ScrollView,
+    StyleSheet,
+    Text,
+    TouchableOpacity,
+    View,
 } from 'react-native';
 
 export default function MissionSelectScreen() {

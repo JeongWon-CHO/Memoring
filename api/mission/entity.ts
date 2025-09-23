@@ -60,3 +60,9 @@ export interface GetCurrentMissionResponse extends APIResponse {
   has_mission: boolean;
   mission?: CurrentMissionPayload | null;
 }
+
+// 미션 포기
+export interface GiveUpMissionResponse extends APIResponse {
+  mission_id: number;
+  status: 'GIVEN_UP' | 'SELECTED';
+}

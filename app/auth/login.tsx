@@ -1,22 +1,22 @@
+import { postLogin } from '@/api/login';
 import { colors } from '@/constants/colors';
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
+import * as SecureStore from 'expo-secure-store';
 import React, { useState } from 'react';
 import {
-  Alert,
-  Keyboard,
-  KeyboardAvoidingView,
-  Platform,
-  StyleSheet,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  TouchableWithoutFeedback,
-  View
+    Alert,
+    Keyboard,
+    KeyboardAvoidingView,
+    Platform,
+    StyleSheet,
+    Text,
+    TextInput,
+    TouchableOpacity,
+    TouchableWithoutFeedback,
+    View
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { postLogin } from '@/app/api/login';
-import * as SecureStore from 'expo-secure-store';
 
 export default function LoginScreen() {
   const [id, setId] = useState('');

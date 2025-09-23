@@ -1,6 +1,7 @@
 import { APIRequest, HTTP_METHOD } from '../APIRequest';
 import {
   GetCurrentMissionResponse,
+  GiveUpMissionResponse,
   MissionCandidatesResponse,
   MissionScheduleRequest,
   MissionScheduleResponse,
@@ -84,4 +85,16 @@ export class GetCurrentMission<R extends GetCurrentMissionResponse> implements A
   path = 'missions/current/';
   response!: R;
   auth = true;
+}
+
+// POST /missions/{user_mission_id}/giveup/
+export class PostGiveUpMission<R extends GiveUpMissionResponse> implements APIRequest<R> {
+  method = HTTP_METHOD.POST;
+  path: string;
+  response!: R;
+  auth = true;
+
+  constructor(user_mission_id: number) {
+    this.path = `missions/${user_mission_id}/giveup/`;
+  }
 }
