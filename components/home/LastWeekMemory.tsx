@@ -1,6 +1,5 @@
 import { colors } from '@/constants/colors';
 import { typography } from '@/constants/typography';
-import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import React, { useRef, useState } from 'react';
 import {
@@ -11,8 +10,7 @@ import {
   PanResponder,
   StyleSheet,
   Text,
-  TouchableOpacity,
-  View,
+  View
 } from 'react-native';
 
 const { width: screenWidth } = Dimensions.get('window');
@@ -24,6 +22,8 @@ export default function LastWeekMemory() {
   const [activeIndex, setActiveIndex] = useState(0);
   const translateX = useRef(new Animated.Value(0)).current;
   const [isAnimating, setIsAnimating] = useState(false);
+  const animatingRef = useRef(false);
+  const activeIndexRef = useRef(0);
 
   // TODO: 실제 메모리 데이터는 API에서 가져오기
   const memories = [
@@ -32,56 +32,58 @@ export default function LastWeekMemory() {
       date: '8월 4주차',
       title: '미션1',
       subtitle: '산책을 하며 발견한 꽃 사진 찍기',
-      image: null,
+      image: require('../../assets/images/mission1.jpg'),
     },
     {
       id: 2,
       date: '8월 5주차',
       title: '미션2',
       subtitle: '가족과 함께 저녁 식사',
-      image: null,
+      image: require('../../assets/images/mission2.jpg'),
     },
     {
       id: 3,
       date: '9월 1주차',
       title: '미션3',
       subtitle: '좋아하는 노래 듣기',
-      image: null,
+      image: require('../../assets/images/mission3.jpg'),
     },
     {
       id: 4,
       date: '9월 2주차',
       title: '미션4',
       subtitle: '좋아하는 책 읽기',
-      image: null,
+      image: require('../../assets/images/mission4.jpg'),
     },
     {
       id: 5,
       date: '9월 3주차',
       title: '미션5',
       subtitle: '친구와 통화하기',
-      image: null,
+      image: require('../../assets/images/mission5.jpg'),
     },
   ];
 
   const panResponder = useRef(
     PanResponder.create({
-      onStartShouldSetPanResponder: () => !isAnimating,
-      onMoveShouldSetPanResponder: () => !isAnimating,
+      onStartShouldSetPanResponder: () => true,
+      onMoveShouldSetPanResponder: () => true,
       onPanResponderMove: (_, gestureState) => {
-        if (!isAnimating) {
+        if (!animatingRef.current) {
           translateX.setValue(gestureState.dx * 0.5); // 드래그 감도 조절
         }
       },
       onPanResponderRelease: (_, gestureState) => {
+        if (animatingRef.current) return;
+
         const velocity = gestureState.vx;
         const swipeThreshold = 30;
         const velocityThreshold = 0.3;
 
-        if ((gestureState.dx < -swipeThreshold || velocity < -velocityThreshold) && activeIndex < memories.length - 1) {
+        if ((gestureState.dx < -swipeThreshold || velocity < -velocityThreshold) && activeIndexRef.current < memories.length - 1) {
           // Swipe left - next
           handleNext();
-        } else if ((gestureState.dx > swipeThreshold || velocity > velocityThreshold) && activeIndex > 0) {
+        } else if ((gestureState.dx > swipeThreshold || velocity > velocityThreshold) && activeIndexRef.current > 0) {
           // Swipe right - previous
           handlePrev();
         } else {
@@ -98,35 +100,47 @@ export default function LastWeekMemory() {
   ).current;
 
   const handleNext = () => {
-    if (activeIndex < memories.length - 1 && !isAnimating) {
+    if (activeIndexRef.current < memories.length - 1 && !animatingRef.current) {
+      animatingRef.current = true;
       setIsAnimating(true);
 
-      Animated.timing(translateX, {
-        toValue: -screenWidth * 0.8,
-        duration: 300,
-        useNativeDriver: true,
-        easing: Easing.out(Easing.cubic),
-      }).start(() => {
-        setActiveIndex(activeIndex + 1);
-
-        // 즉시 반대편에서 시작
-        translateX.setValue(screenWidth * 0.2);
-
-        // 부드럽게 제자리로
+      Animated.sequence([
         Animated.timing(translateX, {
-          toValue: 0,
-          duration: 200,
+          toValue: -screenWidth * 0.8,
+          duration: 300,
           useNativeDriver: true,
           easing: Easing.out(Easing.cubic),
-        }).start(() => {
-          setIsAnimating(false);
+        }),
+      ]).start(() => {
+        setActiveIndex((prevIndex) => {
+          const nextIndex = prevIndex + 1;
+          activeIndexRef.current = nextIndex;
+
+          // 위치 초기화
+          translateX.setValue(screenWidth * 0.2);
+
+          // 부드럽게 제자리로
+          Animated.timing(translateX, {
+            toValue: 0,
+            duration: 200,
+            useNativeDriver: true,
+            easing: Easing.out(Easing.cubic),
+          }).start(() => {
+            animatingRef.current = false;
+            setIsAnimating(false);
+          });
+
+          return nextIndex;
         });
       });
     }
   };
 
   const handlePrev = () => {
-    if (activeIndex > 0 && !isAnimating) {
+    console.log('handlePrev called, activeIndexRef.current:', activeIndexRef.current, 'animatingRef.current:', animatingRef.current);
+
+    if (activeIndexRef.current > 0 && !animatingRef.current) {
+      animatingRef.current = true;
       setIsAnimating(true);
 
       Animated.timing(translateX, {
@@ -135,19 +149,27 @@ export default function LastWeekMemory() {
         useNativeDriver: true,
         easing: Easing.out(Easing.cubic),
       }).start(() => {
-        setActiveIndex(activeIndex - 1);
+        setActiveIndex((prevIndex) => {
+          const newIndex = prevIndex - 1;
+          activeIndexRef.current = newIndex;
+          console.log('Setting new index from', prevIndex, 'to', newIndex);
 
-        // 즉시 반대편에서 시작
-        translateX.setValue(-screenWidth * 0.2);
+          // 위치 초기화
+          translateX.setValue(-screenWidth * 0.2);
 
-        // 부드럽게 제자리로
-        Animated.timing(translateX, {
-          toValue: 0,
-          duration: 200,
-          useNativeDriver: true,
-          easing: Easing.out(Easing.cubic),
-        }).start(() => {
-          setIsAnimating(false);
+          // 부드럽게 제자리로
+          Animated.timing(translateX, {
+            toValue: 0,
+            duration: 200,
+            useNativeDriver: true,
+            easing: Easing.out(Easing.cubic),
+          }).start(() => {
+            animatingRef.current = false;
+            setIsAnimating(false);
+            console.log('Animation complete, animatingRef.current set to false');
+          });
+
+          return newIndex;
         });
       });
     }
@@ -280,7 +302,7 @@ export default function LastWeekMemory() {
               >
                 <View style={styles.imageContainer}>
                   {memory.image ? (
-                    <Image source={{ uri: memory.image }} style={styles.memoryImage} />
+                    <Image source={memory.image} style={styles.memoryImage} />
                   ) : (
                     <View style={styles.placeholderImage}>
                       <Text style={[typography.B2, styles.placeholderText]}>메모리 이미지</Text>
@@ -292,8 +314,8 @@ export default function LastWeekMemory() {
                   >
                     <View style={styles.overlay}>
                       <Text style={[typography.C1, styles.memoryDate]}>{memory.date}</Text>
-                      <Text style={[typography.B1_BOLD, styles.memoryTitle]}>{memory.title}</Text>
-                      <Text style={[typography.B2, styles.memorySubtitle]}>{memory.subtitle}</Text>
+                      <Text style={[typography.C1, styles.memoryTitle]}>{memory.title}</Text>
+                      <Text style={[typography.C2, styles.memorySubtitle]}>{memory.subtitle}</Text>
                     </View>
                   </LinearGradient>
                 </View>
@@ -303,7 +325,7 @@ export default function LastWeekMemory() {
         </View>
 
         {/* Navigation buttons */}
-        {activeIndex > 0 && (
+        {/* {activeIndex > 0 && (
           <TouchableOpacity
             style={[styles.navButton, styles.prevButton]}
             onPress={handlePrev}
@@ -319,7 +341,7 @@ export default function LastWeekMemory() {
           >
             <Ionicons name="chevron-forward" size={24} color={colors.BLACKTEXT} />
           </TouchableOpacity>
-        )}
+        )} */}
       </View>
       </View>
 
