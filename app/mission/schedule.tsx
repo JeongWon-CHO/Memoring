@@ -446,8 +446,8 @@ const styles = StyleSheet.create({
   },
   nextButton: {
     backgroundColor: colors.MAIN,
-    borderRadius: 12,
-    paddingVertical: 16,
+    borderRadius: 32,
+    paddingVertical: 12,
     alignItems: 'center',
   },
   nextButtonText: {

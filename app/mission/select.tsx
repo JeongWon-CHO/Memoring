@@ -7,13 +7,13 @@ import Ionicons from '@expo/vector-icons/Ionicons';
 import { router } from 'expo-router';
 import React, { useEffect, useState } from 'react';
 import {
-    ActivityIndicator,
-    Alert,
-    ScrollView,
-    StyleSheet,
-    Text,
-    TouchableOpacity,
-    View,
+  ActivityIndicator,
+  Alert,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
 } from 'react-native';
 
 export default function MissionSelectScreen() {
@@ -238,8 +238,8 @@ const styles = StyleSheet.create({
   },
   completeButton: {
     backgroundColor: colors.MAIN,
-    borderRadius: 12,
-    paddingVertical: 16,
+    borderRadius: 32,
+    paddingVertical: 12,
     alignItems: 'center',
   },
   completeButtonDisabled: {

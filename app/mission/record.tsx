@@ -308,7 +308,6 @@ export default function MissionRecordScreen() {
       </View>
     </View>
   );
-
 }
 
 const styles = StyleSheet.create({
@@ -327,10 +326,10 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   timerText: {
-    fontSize: 48,
+    fontSize: 32,
     fontWeight: '300',
     color: colors.BLACKTEXT,
-    marginBottom: 60,
+    marginBottom: 40,
   },
   recordButton: {
     width: 140,
