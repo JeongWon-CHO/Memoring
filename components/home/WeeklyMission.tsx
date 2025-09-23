@@ -295,10 +295,9 @@ export default function WeeklyMission() {
                         style={styles.recordButton}
                         onPress={() => {
                           router.push({
-                            pathname: '/mission/record',
+                            pathname: '/mission/progress',
                             params: {
-                              missionId: mission.id,
-                              missionText: mission.missionText,
+                              missionId: mission.serverMissionId,
                               scheduledDate: mission.scheduledDate,
                             }
                           });
