@@ -1,21 +1,19 @@
 import APIClient from '../apiClient';
 import {
-  GetCurrentMission,
-  GetMissionCandidates,
+  DeleteSelectMission,
+  GetMissionList,
   GetPlayRecord,
-  PatchMissionSchedule,
-  PostGiveUpMission,
+  GetShowMission,
   PostSelectMission,
   PostUploadRecord
 } from './APIDetail';
 
 // 미션 관련 API
-export const getMissionCandidates = APIClient.of(GetMissionCandidates);
+export const getMissionList = APIClient.of(GetMissionList);
 export const postSelectMission = APIClient.of(PostSelectMission);
-export const patchMissionSchedule = APIClient.of(PatchMissionSchedule);
-export const getCurrentMission = APIClient.of(GetCurrentMission);
-export const postGiveUpMission = APIClient.of(PostGiveUpMission);
+export const deleteSelectMission = APIClient.of(DeleteSelectMission);
+export const getShowMission = APIClient.of(GetShowMission);
 
 // 음성 관련 API
-export const postUploadRecord = APIClient.of(PostUploadRecord);
 export const getPlayRecord = APIClient.of(GetPlayRecord);
+export const postUploadRecord = APIClient.of(PostUploadRecord);

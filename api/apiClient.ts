@@ -26,7 +26,7 @@ export default class APIClient {
 
   static of = APIClient.toCallable;
 
-  baseURL = Constants.expoConfig?.extra?.API_BASE_URL || 'https://junhong.shop';
+  baseURL = Constants.expoConfig?.extra?.API_BASE_URL || 'https://memoring.n-e.kr';
   timeout = 10000;
 
   private async getToken() {

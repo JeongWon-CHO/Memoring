@@ -1,36 +1,93 @@
 import type { APIResponse } from '../APIResponse';
 
-// 음성 업로드 응답
-export interface UploadRecordResponse extends APIResponse {
-  mission_id: number;
-  voice_url: string;
-}
+/* 
 
-// 음성 재생 응답
+녹음 재생 URL 조회
+
+*/
+
+// 변경된 녹음 재생 URL 조회
 export interface PlayRecordResponse extends APIResponse {
-  voice_url: string;
+  recordId: number;
+  playbackUrl: string;
+  sizeBytes: number;
 }
 
-// 미션 후보 목록 (랜덤 3개)
-export interface MissionCandidate {
+// 변경된 녹음 업로드
+export interface UploadRecordResponse extends APIResponse {
+  recordId: number;
+  playbackUrl: string;
+  sizeBytes: string;
+}
+
+
+/* 
+
+미션 조회 및 선택 API
+
+*/
+
+
+// 변경된 미션 목록 조회
+export interface MissionList {
   id: number;
   content: string;
 }
 
-export interface MissionCandidatesResponse extends APIResponse {
-  candidates: MissionCandidate[];
+export interface MissionListResponse extends APIResponse {
+  list: MissionList[];
 }
 
-// 미션 선택 요청
+// 변경된 미션 선택
 export interface SelectMissionRequest {
-  mission_id: number;
+  missionId: number;
 }
 
-// 미션 선택 응답
+// 변경된 미션 선택 응답
 export interface SelectMissionResponse extends APIResponse {
   mission_id: number;
-  status: string;
 }
+
+// 변경된 미션 취소
+export interface CancelMissionResponse extends APIResponse { }
+
+// 변경된 사용자 미션 조회
+export interface ShowMissionResponse extends APIResponse {
+  missionId: number;
+  content: string;
+}
+
+
+/* 
+
+댓글 작성 및 삭제 API
+
+*/
+
+// 변경된 댓글 생성
+export interface CreateCommentRequest {
+  diaryId: number;
+  content: string;
+}
+
+// 변경된 댓글 생성 응답
+export interface CreateCommentResponse extends APIResponse {
+  commentId: number;
+  diaryId: number;
+  userId: number;
+  content: string;
+  createdAt: string;
+}
+
+// 변경된 댓글 삭제
+export interface DeleteCommentRequest {
+  commentId: number;
+}
+
+
+// ========================= 수정 전 =========================
+
+
 
 // 일정 설정 요청/응답
 export interface MissionScheduleRequest {
@@ -44,7 +101,7 @@ export interface MissionScheduleResponse extends APIResponse {
   alarm_offset_minutes: number;
 }
 
-// 메인화면에 보여주는 미션 정보
+// 메인화면에 보여주는 미션 정보 status가 given_up이면 이 객체를 반환 안 함
 export interface CurrentMissionPayload {
   id: number;
   title: string;
@@ -54,6 +111,7 @@ export interface CurrentMissionPayload {
   voice_uploaded: boolean;
   completed: boolean;
   listenable: boolean;
+  status: "IN_PROGRESS" | "COMPLETED";
 }
 
 export interface GetCurrentMissionResponse extends APIResponse {

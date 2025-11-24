@@ -1,16 +1,26 @@
 import { APIRequest, HTTP_METHOD } from '../APIRequest';
 import {
-  GetCurrentMissionResponse,
-  GiveUpMissionResponse,
-  MissionCandidatesResponse,
-  MissionScheduleRequest,
-  MissionScheduleResponse,
+  CancelMissionResponse,
+  MissionListResponse,
   PlayRecordResponse,
   SelectMissionRequest,
   SelectMissionResponse,
+  ShowMissionResponse,
   UploadRecordResponse
 } from './entity';
 
+// GET  api/v1/record (녹음 재생 URL 조회)
+export class GetPlayRecord<R extends PlayRecordResponse> implements APIRequest<R> {
+  method = HTTP_METHOD.GET;
+  path: string;
+  response!: R;
+
+  constructor(public id: number) {
+    this.path = `api/v1/record`;
+  }
+}
+
+// POST  api/v1/record (녹음 업로드)
 export class PostUploadRecord<R extends UploadRecordResponse> implements APIRequest<R> {
   method = HTTP_METHOD.POST;
   path: string;
@@ -19,7 +29,7 @@ export class PostUploadRecord<R extends UploadRecordResponse> implements APIRequ
   headers = { 'Content-Type': 'multipart/form-data' };
 
   constructor(public id: number, fileUri: string, fileName: string = 'recording.m4a') {
-    this.path = `missions/${id}/voice/`;
+    this.path = `api/v1/record`;
     this.data = new FormData();
     // React Native에서 파일 업로드를 위한 형식
     this.data.append('file', {
@@ -30,71 +40,90 @@ export class PostUploadRecord<R extends UploadRecordResponse> implements APIRequ
   }
 }
 
-export class GetPlayRecord<R extends PlayRecordResponse> implements APIRequest<R> {
+// GET  api/v1/mission (미션 목록 조회)
+export class GetMissionList<R extends MissionListResponse> implements APIRequest<R> {
   method = HTTP_METHOD.GET;
-  path: string;
-  response!: R;
-
-  constructor(public id: number) {
-    this.path = `missions/${id}/voice/`;
-  }
-}
-
-// 미션 후보 목록 조회 (GET /missions/candidates/)
-export class GetMissionCandidates<R extends MissionCandidatesResponse> implements APIRequest<R> {
-  method = HTTP_METHOD.GET;
-  path = 'missions/candidates/';
+  path = 'api/v1/mission';
   response!: R;
   auth = true;
   authorization?: string;
+
   constructor(token?: string) {
     this.authorization = token;
   }
 }
 
-// 미션 선택 (POST /missions/select/)
+// POST  api/v1/mission (미션 선택)
 export class PostSelectMission<R extends SelectMissionResponse> implements APIRequest<R> {
   method = HTTP_METHOD.POST;
-  path = 'missions/select/';
+  path = 'api/v1/mission';
   response!: R;
   auth = true;
+  authorization?: string;
   data: SelectMissionRequest;
 
-  constructor(missionId: number) {
-    this.data = { mission_id: missionId };
+  constructor(missionId: number, token?: string) {
+    this.data = { missionId };
+    this.authorization = token;
   }
 }
 
-// PATCH /missions/{user_mission_id}/schedule/
-export class PatchMissionSchedule<R extends MissionScheduleResponse> implements APIRequest<R> {
-  method = HTTP_METHOD.PATCH;
-  path: string;
+// DELETE  api/v1/mission (미션 취소)
+export class DeleteSelectMission<R extends CancelMissionResponse> implements APIRequest<R> {
+  method = HTTP_METHOD.DELETE;
+  path = 'api/v1/mission';
   response!: R;
-  data: MissionScheduleRequest;
   auth = true;
+  authorization?: string;
 
-  constructor(userMissionId: number, body: MissionScheduleRequest) {
-    this.path = `missions/${userMissionId}/schedule/`;
-    this.data = body;
+  constructor(token?: string) {
+    this.authorization = token;
   }
 }
 
-// GET /missions/current/
-export class GetCurrentMission<R extends GetCurrentMissionResponse> implements APIRequest<R> {
+// GET  api/v1/mission/selected (사용자 미션 조회)
+export class GetShowMission<R extends ShowMissionResponse> implements APIRequest<R> {
   method = HTTP_METHOD.GET;
-  path = 'missions/current/';
+  path = 'api/v1/mission/selected';
   response!: R;
   auth = true;
-}
+  authorization?: string;
 
-// POST /missions/{user_mission_id}/giveup/
-export class PostGiveUpMission<R extends GiveUpMissionResponse> implements APIRequest<R> {
-  method = HTTP_METHOD.POST;
-  path: string;
-  response!: R;
-  auth = true;
-
-  constructor(user_mission_id: number) {
-    this.path = `missions/${user_mission_id}/giveup/`;
+  constructor(token?: string) {
+    this.authorization = token;
   }
 }
+
+// // PATCH /missions/{user_mission_id}/schedule/
+// export class PatchMissionSchedule<R extends MissionScheduleResponse> implements APIRequest<R> {
+//   method = HTTP_METHOD.PATCH;
+//   path: string;
+//   response!: R;
+//   data: MissionScheduleRequest;
+//   auth = true;
+
+//   constructor(userMissionId: number, body: MissionScheduleRequest) {
+//     this.path = `missions/${userMissionId}/schedule/`;
+//     this.data = body;
+//   }
+// }
+
+// // GET /missions/current/
+// export class GetCurrentMission<R extends GetCurrentMissionResponse> implements APIRequest<R> {
+//   method = HTTP_METHOD.GET;
+//   path = 'missions/current/';
+//   response!: R;
+//   auth = true;
+// }
+
+// // POST /missions/{user_mission_id}/giveup/
+// export class PostGiveUpMission<R extends GiveUpMissionResponse> implements APIRequest<R> {
+//   method = HTTP_METHOD.POST;
+//   path: string;
+//   response!: R;
+//   auth = true;
+
+//   constructor(user_mission_id: number) {
+//     this.path = `missions/${user_mission_id}/giveup/`;
+//   }
+// }
