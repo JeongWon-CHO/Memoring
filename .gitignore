@@ -41,3 +41,6 @@ app-example
 # generated native folders
 /ios
 /android
+
+# 환경 변수 설정 파일
+.env
