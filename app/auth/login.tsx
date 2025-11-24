@@ -1,4 +1,3 @@
-import { postLogin } from '@/api/login';
 import { colors } from '@/constants/colors';
 import { typography } from '@/constants/typography';
 import { Ionicons } from '@expo/vector-icons';
@@ -19,7 +18,16 @@ import {
   View
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { useLogin } from '../../hooks/useLogin';
 
+/* 
+
+[관리자 계정]
+
+admin
+password
+
+*/
 export default function LoginScreen() {
   const [id, setId] = useState('');
   const [password, setPassword] = useState('');
@@ -27,6 +35,8 @@ export default function LoginScreen() {
   const [autoLogin, setAutoLogin] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
+  const login = useLogin();
+  
   const handleLogin = async () => {
     if (!id || !password) {
       Alert.alert('알림', '아이디와 비밀번호를 입력해주세요.');
@@ -35,10 +45,14 @@ export default function LoginScreen() {
 
     setIsLoading(true);
 
+    // router.replace('/(tabs)');
+
+    // setIsLoading(false);
+
     try {
-      const response = await postLogin({
-        id,
-        password,
+      await login({
+        loginId: id,
+        loginPw: password,
       });
 
       // 자동 로그인 설정 저장
@@ -53,8 +67,6 @@ export default function LoginScreen() {
       console.error('Login error:', error);
       if (error.status === 401) {
         Alert.alert('로그인 실패', '아이디 또는 비밀번호가 일치하지 않습니다.');
-      } else if (error.status === 404) {
-        Alert.alert('로그인 실패', '존재하지 않는 계정입니다.');
       } else {
         Alert.alert('로그인 실패', '로그인에 실패했습니다. 다시 시도해주세요.');
       }

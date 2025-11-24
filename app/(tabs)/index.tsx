@@ -6,7 +6,7 @@ import { typography } from '@/constants/typography';
 import React, { useEffect, useState } from 'react';
 import { Image, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { getUserMe } from '../../api/login';
+import { getUserMe } from '../../api/auth';
 
 export default function HomeScreen() {
   const [userName, setUserName] = useState<string>('');     // ← 서버 값
@@ -17,8 +17,8 @@ export default function HomeScreen() {
     (async () => {
       try {
         const res = await getUserMe();
-        if (mounted && res?.username) {
-          setUserName(res.username);
+        if (mounted && res?.nickname) {
+          setUserName(res.nickname);
         }
       } catch (e) {
         if (mounted) setUserName('사용자');
