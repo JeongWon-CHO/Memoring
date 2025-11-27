@@ -62,7 +62,7 @@ export default function LoginScreen() {
       }
 
       // 로그인 성공 시 메인 화면으로 이동
-      router.replace('/(tabs)');
+      router.replace('/');
     } catch (error: any) {
       console.error('Login error:', error);
       if (error.status === 401) {

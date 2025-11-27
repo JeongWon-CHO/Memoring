@@ -13,7 +13,7 @@ import {
   TouchableOpacity,
   View
 } from 'react-native';
-import { getPlayRecord, postUploadRecord } from '../../api/mission';
+import { getPlayRecord, postUploadRecord } from '../../../api/mission';
 
 export default function MissionRecordScreen() {
   const getParam = (v: any) => (Array.isArray(v) ? v[0] : v);

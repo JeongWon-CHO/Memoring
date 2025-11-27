@@ -13,7 +13,7 @@ import {
   View,
 } from 'react-native';
 import { ScrollView as GestureScrollView } from 'react-native-gesture-handler';
-import { patchMissionSchedule } from '../../api/mission';
+import { patchMissionSchedule } from '../../../api/mission';
 
 const DAYS = ['일', '월', '화', '수', '목', '금', '토'];
 

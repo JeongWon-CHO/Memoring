@@ -1,5 +1,5 @@
-import { getMissionCandidates, postSelectMission } from '@/api/mission';
-import { MissionCandidate } from '@/api/mission/entity';
+import { getMissionList, postSelectMission } from '@/api/mission';
+import { MissionList } from '@/api/mission/entity';
 import Header from '@/components/common/Header';
 import { colors } from '@/constants/colors';
 import { typography } from '@/constants/typography';
@@ -18,7 +18,7 @@ import {
 
 export default function MissionSelectScreen() {
   const [selectedMissionId, setSelectedMissionId] = useState<number | null>(null);
-  const [missions, setMissions] = useState<MissionCandidate[]>([]);
+  const [missions, setMissions] = useState<MissionList[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -26,12 +26,13 @@ export default function MissionSelectScreen() {
   const fetchMissionCandidates = async () => {
   setIsLoading(true);
   try {
-    const response = await getMissionCandidates();
+    const response = await getMissionList();
 
     const list =
       Array.isArray(response)
         ? response
-        : (response?.candidates ?? []);
+        : (response.list ?? []);
+    console.log(list);
 
     setMissions(list);
     setSelectedMissionId(null);

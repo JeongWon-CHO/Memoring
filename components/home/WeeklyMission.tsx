@@ -20,6 +20,7 @@ type CurrentMissionUI = {
   description: string;
   scheduledAt: string | null;
   listenable: boolean;
+  status: "IN_PROGRESS" | "COMPLETED";
 };
 
 type WeeklyMissionItem = {
@@ -58,19 +59,22 @@ export default function WeeklyMission() {
       try {
         const resp = await getCurrentMission();
         console.log(resp);
-        if (mounted  && resp?.has_mission && resp.mission) {
-          const m = resp.mission;
-          const item: WeeklyMissionItem = {
-            id: String(m.id),
-            serverMissionId: m.id, // ★ user_mission_id
-            missionText: m.title ?? m.description ?? '미션',
-            scheduledDate: m.scheduled_at ?? new Date().toISOString(), // null이면 임시로 today
-            completed: !!m.completed,
-          };
-          setWeeklyMissions([item]);
-        } else {
-          setCurrent(null);
-          setWeeklyMissions([]);
+        if (mounted) {
+          if (resp?.has_mission && resp.mission) {
+            const m = resp.mission;
+            const item: WeeklyMissionItem = {
+              id: String(m.id),
+              serverMissionId: m.id, // ★ user_mission_id
+              missionText: m.title ?? m.description ?? '미션',
+              scheduledDate: m.scheduled_at ?? new Date().toISOString(), // null이면 임시로 today
+              completed: !!m.completed,
+            };
+            setWeeklyMissions([item]);
+          } else {
+            // has_mission이 false인 경우 빈 배열로 설정하여 '등록하기' UI 표시
+            setCurrent(null);
+            setWeeklyMissions([]);
+          }
         }
       } catch (e) {
         // 로그인 안 되어 있거나 에러: 조용히 무시 or 안내
@@ -174,9 +178,28 @@ export default function WeeklyMission() {
 
               // 토큰이 필요하면 2번째 인자로 전달: postGiveUpMission(mission.serverMissionId, token)
               const res = await postGiveUpMission(mission.serverMissionId);
+              console.log('[포기 응답]', res);
 
-              // 성공 처리: 리스트에서 제거하거나 상태 갱신
-              setWeeklyMissions(prev => prev.filter(m => m.id !== mission.id));
+              // 성공 처리: 서버에서 최신 상태 다시 가져오기
+              const newResp = await getCurrentMission();
+              console.log('[포기 후 getCurrentMission 응답]', newResp);
+
+              if (newResp?.has_mission && newResp.mission) {
+                const m = newResp.mission;
+                const item: WeeklyMissionItem = {
+                  id: String(m.id),
+                  serverMissionId: m.id,
+                  missionText: m.title ?? m.description ?? '미션',
+                  scheduledDate: m.scheduled_at ?? new Date().toISOString(),
+                  completed: !!m.completed,
+                };
+                setWeeklyMissions([item]);
+              } else {
+                // has_mission이 false인 경우 빈 배열로 설정
+                console.log('[미션 없음 - 빈 배열 설정]');
+                setWeeklyMissions([]);
+                setCurrent(null);
+              }
 
               Alert.alert('완료', '미션을 포기했습니다.');
             } catch (e: any) {
