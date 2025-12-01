@@ -22,26 +22,25 @@ type Ad = {
 };
 
 const ads: Ad[] = [
-    {
-      id: 1,
-      title: '노인치매안심센터',
-      image: require('../../assets/images/CenterPhoto.png'), // 실제 이미지 URL
-    },
-    {
-      id: 2,
-      title: '노인치매안심센터2',
-      image: null,
-    },
-    {
-      id: 3,
-      title: '노인치매안심센터3',
-      image: null,
-    },
-  ];
+  {
+    id: 1,
+    title: '노인치매안심센터',
+    image: require('../../assets/images/CenterPhoto.png'), // 실제 이미지 URL
+  },
+  {
+    id: 2,
+    title: '노인치매안심센터2',
+    image: null,
+  },
+  {
+    id: 3,
+    title: '노인치매안심센터3',
+    image: null,
+  },
+];
 
 export default function AdBanner() {
   // TODO: 실제 광고 데이터는 API에서 가져오기
-  
 
   return (
     <View style={styles.container}>
@@ -51,7 +50,7 @@ export default function AdBanner() {
         showsHorizontalScrollIndicator={false}
         style={styles.scrollView}
       >
-        {ads.map((ad) => (
+        {ads.map(ad => (
           <View key={ad.id} style={styles.adCard}>
             <View style={styles.imageContainer}>
               {ad.image ? (

@@ -13,7 +13,7 @@ import {
   Text,
   TextInput,
   TouchableOpacity,
-  View
+  View,
 } from 'react-native';
 
 type MoodType = 'laugh' | 'smile' | 'meh' | 'sad-tear';
@@ -22,7 +22,7 @@ export default function MissionProgressScreen() {
   const params = useLocalSearchParams();
   const getParam = (v: any) => (Array.isArray(v) ? v[0] : v);
 
-  const missionDate = getParam(params.scheduledDate) as string || new Date().toISOString();
+  const missionDate = (getParam(params.scheduledDate) as string) || new Date().toISOString();
   const missionId = getParam(params.missionId);
 
   const [selectedMood, setSelectedMood] = useState<MoodType | null>(null);
@@ -52,7 +52,7 @@ export default function MissionProgressScreen() {
       missionId,
       mood: selectedMood,
       memo: memoText,
-      photo: photoUri
+      photo: photoUri,
     });
 
     router.back();
@@ -69,7 +69,7 @@ export default function MissionProgressScreen() {
 
   return (
     <View style={styles.container}>
-      <Header title="메모리" />
+      <Header title='메모리' />
 
       <KeyboardAvoidingView
         style={styles.content}
@@ -91,13 +91,10 @@ export default function MissionProgressScreen() {
           <View style={styles.section}>
             <Text style={[typography.B2_BOLD, styles.sectionTitle]}>오늘의 기분</Text>
             <View style={styles.moodContainer}>
-              {moodOptions.map((mood) => (
+              {moodOptions.map(mood => (
                 <TouchableOpacity
                   key={mood.icon}
-                  style={[
-                    styles.moodButton,
-                    mood.selected && styles.moodButtonSelected
-                  ]}
+                  style={[styles.moodButton, mood.selected && styles.moodButtonSelected]}
                   onPress={() => setSelectedMood(mood.icon)}
                 >
                   <FontAwesome5
@@ -116,11 +113,11 @@ export default function MissionProgressScreen() {
             <TextInput
               style={[typography.C1, styles.memoInput]}
               multiline
-              placeholder="오늘 미션을 하며 느낀 점을 적어주세요!"
+              placeholder='오늘 미션을 하며 느낀 점을 적어주세요!'
               placeholderTextColor={colors.GRAY_400}
               value={memoText}
               onChangeText={setMemoText}
-              textAlignVertical="top"
+              textAlignVertical='top'
             />
           </View>
 
@@ -132,11 +129,8 @@ export default function MissionProgressScreen() {
             </View>
 
             <View style={styles.photoContainer}>
-              <TouchableOpacity
-                style={styles.addPhotoButton}
-                onPress={handleAddPhoto}
-              >
-                <Ionicons name="add" size={32} color={colors.GRAY_400} />
+              <TouchableOpacity style={styles.addPhotoButton} onPress={handleAddPhoto}>
+                <Ionicons name='add' size={32} color={colors.GRAY_400} />
               </TouchableOpacity>
             </View>
           </View>
@@ -145,23 +139,13 @@ export default function MissionProgressScreen() {
 
       {/* 하단 버튼들 */}
       <View style={styles.bottomButtons}>
-        <TouchableOpacity
-          style={styles.saveButton}
-          onPress={handleSaveProgress}
-        >
-          <Ionicons name="download-outline" size={20} color={colors.WHITE} />
-          <Text style={[typography.B1_BOLD, styles.saveButtonText]}>
-            메모저장
-          </Text>
+        <TouchableOpacity style={styles.saveButton} onPress={handleSaveProgress}>
+          <Ionicons name='download-outline' size={20} color={colors.WHITE} />
+          <Text style={[typography.B1_BOLD, styles.saveButtonText]}>메모저장</Text>
         </TouchableOpacity>
 
-        <TouchableOpacity
-          style={styles.cancelButton}
-          onPress={handleCancel}
-        >
-          <Text style={[typography.B1_BOLD, styles.cancelButtonText]}>
-            취소
-          </Text>
+        <TouchableOpacity style={styles.cancelButton} onPress={handleCancel}>
+          <Text style={[typography.B1_BOLD, styles.cancelButtonText]}>취소</Text>
         </TouchableOpacity>
       </View>
     </View>

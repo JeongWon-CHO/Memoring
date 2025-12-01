@@ -10,7 +10,7 @@ import {
   PanResponder,
   StyleSheet,
   Text,
-  View
+  View,
 } from 'react-native';
 
 const { width: screenWidth } = Dimensions.get('window');
@@ -80,10 +80,16 @@ export default function LastWeekMemory() {
         const swipeThreshold = 30;
         const velocityThreshold = 0.3;
 
-        if ((gestureState.dx < -swipeThreshold || velocity < -velocityThreshold) && activeIndexRef.current < memories.length - 1) {
+        if (
+          (gestureState.dx < -swipeThreshold || velocity < -velocityThreshold) &&
+          activeIndexRef.current < memories.length - 1
+        ) {
           // Swipe left - next
           handleNext();
-        } else if ((gestureState.dx > swipeThreshold || velocity > velocityThreshold) && activeIndexRef.current > 0) {
+        } else if (
+          (gestureState.dx > swipeThreshold || velocity > velocityThreshold) &&
+          activeIndexRef.current > 0
+        ) {
           // Swipe right - previous
           handlePrev();
         } else {
@@ -96,7 +102,7 @@ export default function LastWeekMemory() {
           }).start();
         }
       },
-    })
+    }),
   ).current;
 
   const handleNext = () => {
@@ -112,7 +118,7 @@ export default function LastWeekMemory() {
           easing: Easing.out(Easing.cubic),
         }),
       ]).start(() => {
-        setActiveIndex((prevIndex) => {
+        setActiveIndex(prevIndex => {
           const nextIndex = prevIndex + 1;
           activeIndexRef.current = nextIndex;
 
@@ -137,7 +143,12 @@ export default function LastWeekMemory() {
   };
 
   const handlePrev = () => {
-    console.log('handlePrev called, activeIndexRef.current:', activeIndexRef.current, 'animatingRef.current:', animatingRef.current);
+    console.log(
+      'handlePrev called, activeIndexRef.current:',
+      activeIndexRef.current,
+      'animatingRef.current:',
+      animatingRef.current,
+    );
 
     if (activeIndexRef.current > 0 && !animatingRef.current) {
       animatingRef.current = true;
@@ -149,7 +160,7 @@ export default function LastWeekMemory() {
         useNativeDriver: true,
         easing: Easing.out(Easing.cubic),
       }).start(() => {
-        setActiveIndex((prevIndex) => {
+        setActiveIndex(prevIndex => {
           const newIndex = prevIndex - 1;
           activeIndexRef.current = newIndex;
           console.log('Setting new index from', prevIndex, 'to', newIndex);
@@ -202,60 +213,94 @@ export default function LastWeekMemory() {
     const position = index - activeIndex;
 
     const scale = translateX.interpolate({
-      inputRange: [-screenWidth, -screenWidth/2, 0, screenWidth/2, screenWidth],
-      outputRange: position === -2 ? [0.78, 0.76, 0.75, 0.77, 0.8] :
-                    position === -1 ? [0.9, 0.87, 0.85, 0.88, 0.92] :
-                    position === 0 ? [1.05, 1.02, 1, 0.98, 0.95] :
-                    position === 1 ? [0.92, 0.9, 0.88, 0.86, 0.84] :
-                    position === 2 ? [0.82, 0.8, 0.78, 0.76, 0.74] : [0.7, 0.7, 0.7, 0.7, 0.7],
+      inputRange: [-screenWidth, -screenWidth / 2, 0, screenWidth / 2, screenWidth],
+      outputRange:
+        position === -2
+          ? [0.78, 0.76, 0.75, 0.77, 0.8]
+          : position === -1
+            ? [0.9, 0.87, 0.85, 0.88, 0.92]
+            : position === 0
+              ? [1.05, 1.02, 1, 0.98, 0.95]
+              : position === 1
+                ? [0.92, 0.9, 0.88, 0.86, 0.84]
+                : position === 2
+                  ? [0.82, 0.8, 0.78, 0.76, 0.74]
+                  : [0.7, 0.7, 0.7, 0.7, 0.7],
       extrapolate: 'clamp',
     });
 
     const translateXCard = translateX.interpolate({
-      inputRange: [-screenWidth, -screenWidth/2, 0, screenWidth/2, screenWidth],
-      outputRange: position === -2 ? [-70, -65, -80, -55, -50] :
-                    position === -1 ? [-45, -40, -45, -30, -25] :
-                    position === 0 ? [-30, -15, 0, 15, 30] :
-                    position === 1 ? [0, 12, 45, 37, 50] :
-                    position === 2 ? [25, 37, 80, 62, 75] : [0, 0, 0, 0, 0],
+      inputRange: [-screenWidth, -screenWidth / 2, 0, screenWidth / 2, screenWidth],
+      outputRange:
+        position === -2
+          ? [-70, -65, -80, -55, -50]
+          : position === -1
+            ? [-45, -40, -45, -30, -25]
+            : position === 0
+              ? [-30, -15, 0, 15, 30]
+              : position === 1
+                ? [0, 12, 45, 37, 50]
+                : position === 2
+                  ? [25, 37, 80, 62, 75]
+                  : [0, 0, 0, 0, 0],
       extrapolate: 'clamp',
     });
 
     const rotateY = translateX.interpolate({
-      inputRange: [-screenWidth, -screenWidth/2, 0, screenWidth/2, screenWidth],
-      outputRange: position === 0 ? ['-25deg', '-12deg', '0deg', '12deg', '25deg'] :
-                    position === 1 ? ['-10deg', '-5deg', '0deg', '5deg', '10deg'] :
-                    position === -1 ? ['10deg', '5deg', '0deg', '-5deg', '-10deg'] :
-                    ['0deg', '0deg', '0deg', '0deg', '0deg'],
+      inputRange: [-screenWidth, -screenWidth / 2, 0, screenWidth / 2, screenWidth],
+      outputRange:
+        position === 0
+          ? ['-25deg', '-12deg', '0deg', '12deg', '25deg']
+          : position === 1
+            ? ['-10deg', '-5deg', '0deg', '5deg', '10deg']
+            : position === -1
+              ? ['10deg', '5deg', '0deg', '-5deg', '-10deg']
+              : ['0deg', '0deg', '0deg', '0deg', '0deg'],
       extrapolate: 'clamp',
     });
 
     const rotateZ = translateX.interpolate({
-      inputRange: [-screenWidth, -screenWidth/2, 0, screenWidth/2, screenWidth],
-      outputRange: position === 0 ? ['3deg', '1.5deg', '0deg', '-1.5deg', '-3deg'] :
-                    position === 1 ? ['2deg', '1deg', '0deg', '-1deg', '-2deg'] :
-                    position === -1 ? ['-2deg', '-1deg', '0deg', '1deg', '2deg'] :
-                    ['0deg', '0deg', '0deg', '0deg', '0deg'],
+      inputRange: [-screenWidth, -screenWidth / 2, 0, screenWidth / 2, screenWidth],
+      outputRange:
+        position === 0
+          ? ['3deg', '1.5deg', '0deg', '-1.5deg', '-3deg']
+          : position === 1
+            ? ['2deg', '1deg', '0deg', '-1deg', '-2deg']
+            : position === -1
+              ? ['-2deg', '-1deg', '0deg', '1deg', '2deg']
+              : ['0deg', '0deg', '0deg', '0deg', '0deg'],
       extrapolate: 'clamp',
     });
 
     const opacity = translateX.interpolate({
-      inputRange: [-screenWidth, -screenWidth/2, 0, screenWidth/2, screenWidth],
-      outputRange: position === -2 ? [0.85, 0.8, 0.75, 0.7, 0.65] :
-                    position === -1 ? [0.95, 0.92, 0.9, 0.85, 0.8] :
-                    position === 0 ? [1, 1, 1, 1, 0.95] :
-                    position === 1 ? [1, 0.98, 0.95, 0.92, 0.9] :
-                    position === 2 ? [0.9, 0.85, 0.8, 0.75, 0.7] :
-                    position < -2 ? [0, 0, 0, 0, 0] : [1, 1, 1, 1, 1],
+      inputRange: [-screenWidth, -screenWidth / 2, 0, screenWidth / 2, screenWidth],
+      outputRange:
+        position === -2
+          ? [0.85, 0.8, 0.75, 0.7, 0.65]
+          : position === -1
+            ? [0.95, 0.92, 0.9, 0.85, 0.8]
+            : position === 0
+              ? [1, 1, 1, 1, 0.95]
+              : position === 1
+                ? [1, 0.98, 0.95, 0.92, 0.9]
+                : position === 2
+                  ? [0.9, 0.85, 0.8, 0.75, 0.7]
+                  : position < -2
+                    ? [0, 0, 0, 0, 0]
+                    : [1, 1, 1, 1, 1],
       extrapolate: 'clamp',
     });
 
     const translateY = translateX.interpolate({
-      inputRange: [-screenWidth, -screenWidth/2, 0, screenWidth/2, screenWidth],
-      outputRange: position === 0 ? [-5, -2, 0, -2, -5] :
-                    position === 1 ? [5, 2, 0, 2, 5] :
-                    position === -1 ? [5, 2, 0, 2, 5] :
-                    [0, 0, 0, 0, 0],
+      inputRange: [-screenWidth, -screenWidth / 2, 0, screenWidth / 2, screenWidth],
+      outputRange:
+        position === 0
+          ? [-5, -2, 0, -2, -5]
+          : position === 1
+            ? [5, 2, 0, 2, 5]
+            : position === -1
+              ? [5, 2, 0, 2, 5]
+              : [0, 0, 0, 0, 0],
       extrapolate: 'clamp',
     });
 
@@ -278,54 +323,62 @@ export default function LastWeekMemory() {
 
       <View style={styles.carouselWrapper}>
         <View style={styles.carouselContainer} {...panResponder.panHandlers}>
-        <View style={styles.cardsWrapper}>
-          {memories.map((memory, index) => {
-            const cardStyle = getCardStyle(index);
-            const animatedStyle = getCardTransform(index);
-            const position = index - activeIndex;
-            const isVisible = position >= -1 && position <= 2;
-            const zIndex = position === 0 ? 4 :
-                          position === 1 ? 3 :
-                          position === 2 ? 2 :
-                          position === -1 ? 1 : 0;
+          <View style={styles.cardsWrapper}>
+            {memories.map((memory, index) => {
+              const cardStyle = getCardStyle(index);
+              const animatedStyle = getCardTransform(index);
+              const position = index - activeIndex;
+              const isVisible = position >= -1 && position <= 2;
+              const zIndex =
+                position === 0
+                  ? 4
+                  : position === 1
+                    ? 3
+                    : position === 2
+                      ? 2
+                      : position === -1
+                        ? 1
+                        : 0;
 
-            return (
-              <Animated.View
-                key={memory.id}
-                style={[
-                  styles.memoryCard,
-                  cardStyle,
-                  animatedStyle,
-                  { zIndex },
-                  !isVisible && styles.hiddenCard,
-                ]}
-              >
-                <View style={styles.imageContainer}>
-                  {memory.image ? (
-                    <Image source={memory.image} style={styles.memoryImage} />
-                  ) : (
-                    <View style={styles.placeholderImage}>
-                      <Text style={[typography.B2, styles.placeholderText]}>메모리 이미지</Text>
-                    </View>
-                  )}
-                  <LinearGradient
-                    colors={['transparent', 'rgba(0, 0, 0, 0.7)']}
-                    style={styles.gradientOverlay}
-                  >
-                    <View style={styles.overlay}>
-                      <Text style={[typography.C1, styles.memoryDate]}>{memory.date}</Text>
-                      <Text style={[typography.C1, styles.memoryTitle]}>{memory.title}</Text>
-                      <Text style={[typography.C2, styles.memorySubtitle]}>{memory.subtitle}</Text>
-                    </View>
-                  </LinearGradient>
-                </View>
-              </Animated.View>
-            );
-          })}
-        </View>
+              return (
+                <Animated.View
+                  key={memory.id}
+                  style={[
+                    styles.memoryCard,
+                    cardStyle,
+                    animatedStyle,
+                    { zIndex },
+                    !isVisible && styles.hiddenCard,
+                  ]}
+                >
+                  <View style={styles.imageContainer}>
+                    {memory.image ? (
+                      <Image source={memory.image} style={styles.memoryImage} />
+                    ) : (
+                      <View style={styles.placeholderImage}>
+                        <Text style={[typography.B2, styles.placeholderText]}>메모리 이미지</Text>
+                      </View>
+                    )}
+                    <LinearGradient
+                      colors={['transparent', 'rgba(0, 0, 0, 0.7)']}
+                      style={styles.gradientOverlay}
+                    >
+                      <View style={styles.overlay}>
+                        <Text style={[typography.C1, styles.memoryDate]}>{memory.date}</Text>
+                        <Text style={[typography.C1, styles.memoryTitle]}>{memory.title}</Text>
+                        <Text style={[typography.C2, styles.memorySubtitle]}>
+                          {memory.subtitle}
+                        </Text>
+                      </View>
+                    </LinearGradient>
+                  </View>
+                </Animated.View>
+              );
+            })}
+          </View>
 
-        {/* Navigation buttons */}
-        {/* {activeIndex > 0 && (
+          {/* Navigation buttons */}
+          {/* {activeIndex > 0 && (
           <TouchableOpacity
             style={[styles.navButton, styles.prevButton]}
             onPress={handlePrev}
@@ -342,19 +395,13 @@ export default function LastWeekMemory() {
             <Ionicons name="chevron-forward" size={24} color={colors.BLACKTEXT} />
           </TouchableOpacity>
         )} */}
-      </View>
+        </View>
       </View>
 
       {/* Pagination dots */}
       <View style={styles.pagination}>
         {memories.map((_, index) => (
-          <View
-            key={index}
-            style={[
-              styles.dot,
-              index === activeIndex && styles.activeDot
-            ]}
-          />
+          <View key={index} style={[styles.dot, index === activeIndex && styles.activeDot]} />
         ))}
       </View>
     </View>
@@ -390,7 +437,6 @@ const styles = StyleSheet.create({
     height: CARD_HEIGHT + 50,
     position: 'relative',
     overflow: 'visible',
-    
   },
   cardsWrapper: {
     flex: 1,
@@ -400,38 +446,23 @@ const styles = StyleSheet.create({
     position: 'absolute',
     width: CARD_WIDTH,
     height: CARD_HEIGHT,
-    left: ((screenWidth - CONTAINER_PADDING) - CARD_WIDTH) / 2, // 컨테이너 중앙
+    left: (screenWidth - CONTAINER_PADDING - CARD_WIDTH) / 2, // 컨테이너 중앙
     top: 20,
   },
   prevCard2: {
-    transform: [
-      { scale: 0.6 },
-      { translateX: -60 },
-    ],
+    transform: [{ scale: 0.6 }, { translateX: -60 }],
   },
   prevCard1: {
-    transform: [
-      { scale: 0.85 },
-      { translateX: -35 },
-    ],
+    transform: [{ scale: 0.85 }, { translateX: -35 }],
   },
   bottomCard: {
-    transform: [
-      { scale: 0.7 },
-      { translateX: 50 },
-    ],
+    transform: [{ scale: 0.7 }, { translateX: 50 }],
   },
   middleCard: {
-    transform: [
-      { scale: 0.88 },
-      { translateX: 25 },
-    ],
+    transform: [{ scale: 0.88 }, { translateX: 25 }],
   },
   activeCard: {
-    transform: [
-      { scale: 1 },
-      { translateX: 0 },
-    ],
+    transform: [{ scale: 1 }, { translateX: 0 }],
   },
   hiddenCard: {
     opacity: 0,

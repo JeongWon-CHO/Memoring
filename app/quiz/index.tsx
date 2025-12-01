@@ -3,26 +3,27 @@ import { colors } from '@/constants/colors';
 import { typography } from '@/constants/typography';
 import Feather from '@expo/vector-icons/Feather';
 import { useFocusEffect } from 'expo-router';
+import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 
 export default function MyScreen() {
   useFocusEffect(() => {
     // router.replace('/auth');
-  })
+  });
 
   return (
     <View>
       <Header title='퀴즈' />
-      
+
       <View style={styles.container}>
         <View style={styles.header}>
           <Text style={typography.B1_BOLD}>퀴즈를 풀어볼까요?</Text>
         </View>
 
         <View style={styles.icon}>
-          <Feather name="check-circle" size={64} color="black" />
+          <Feather name='check-circle' size={64} color='black' />
         </View>
-        
+
         <View style={styles.contentContainer}>
           <View style={styles.quizInfo}>
             <Text style={[typography.C1, styles.subText]}>총 10문제</Text>
@@ -75,5 +76,5 @@ const styles = StyleSheet.create({
   },
   startButtonText: {
     color: colors.WHITE,
-  }
+  },
 });

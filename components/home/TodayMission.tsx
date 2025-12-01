@@ -1,11 +1,6 @@
 import { colors } from '@/constants/colors';
 import React from 'react';
-import {
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
-} from 'react-native';
+import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
 export default function TodayMission() {
   // TODO: 실제 미션 데이터는 API에서 가져오기
@@ -24,7 +19,7 @@ export default function TodayMission() {
           <View
             style={[
               styles.progressFill,
-              { width: `${(mission.currentCount / mission.totalCount) * 100}%` }
+              { width: `${(mission.currentCount / mission.totalCount) * 100}%` },
             ]}
           />
         </View>

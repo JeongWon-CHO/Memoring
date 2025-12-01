@@ -2,16 +2,16 @@ import { postLogout } from '@/api/auth';
 import Header from '@/components/common/Header';
 import { colors } from '@/constants/colors';
 import { router } from 'expo-router';
+import React from 'react';
 import { Alert, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 export default function MyScreen() {
-
   async function handleLogout() {
     try {
       await postLogout();
       Alert.alert('로그아웃', '로그아웃이 완료되었습니다.', [
-        { text: '확인', onPress: () => router.replace('/auth/login') }
+        { text: '확인', onPress: () => router.replace('/auth/login') },
       ]);
       router.replace('/(tabs)');
     } catch (e: any) {
@@ -46,10 +46,7 @@ export default function MyScreen() {
       <SafeAreaView>
         <View style={styles.container}>
           <Text>로그아웃 하시겠습니까?</Text>
-          <TouchableOpacity
-            style={styles.logoutButton}
-            onPress={handleLogout}
-          >
+          <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
             <Text style={styles.logoutButtonText}>로그아웃</Text>
           </TouchableOpacity>
         </View>

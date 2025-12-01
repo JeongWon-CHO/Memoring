@@ -1,5 +1,6 @@
-import { colors } from "@/constants/colors"
-import { Stack } from "expo-router"
+import { colors } from '@/constants/colors';
+import { Stack } from 'expo-router';
+import React from 'react';
 
 export default function MyLayout() {
   return (
@@ -8,15 +9,16 @@ export default function MyLayout() {
         headerShown: false,
         contentStyle: {
           backgroundColor: colors.WHITE,
-        }
+        },
       }}
     >
-      <Stack.Screen name="index" options={{
-        headerShown: false,
-        title: "내 프로필",
-      }}
-      
+      <Stack.Screen
+        name='index'
+        options={{
+          headerShown: false,
+          title: '내 프로필',
+        }}
       />
     </Stack>
-  )
+  );
 }

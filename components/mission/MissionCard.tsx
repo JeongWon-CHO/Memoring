@@ -1,5 +1,6 @@
-import { colors } from "@/constants/colors";
-import { Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { colors } from '@/constants/colors';
+import React from 'react';
+import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
 interface MissionCardProps {
   content: string;
@@ -11,17 +12,17 @@ interface MissionCardProps {
 export default function MissionCard({ content, day, time, imgURL }: MissionCardProps) {
   return (
     <TouchableOpacity style={styles.container} onPress={() => {}}>
-        <Image source={require('../../assets/images/mission1.jpg')} style={styles.img} /> {/* 이거 나중에 requir을 이용해서 url로 받아야 됨 */}
-        
-        <View style={styles.contentContainer}>
-          <View style={styles.textContainer}>
-            <Text style={styles.text}>{content}</Text>
-          </View>
+      <Image source={require('../../assets/images/mission1.jpg')} style={styles.img} />{' '}
+      {/* 이거 나중에 requir을 이용해서 url로 받아야 됨 */}
+      <View style={styles.contentContainer}>
+        <View style={styles.textContainer}>
+          <Text style={styles.text}>{content}</Text>
+        </View>
 
-          <View style={styles.scheduleContainer}>
-            <Text style={styles.schedule}>{day}</Text>
-            <Text style={styles.schedule}>{time}</Text>
-          </View>       
+        <View style={styles.scheduleContainer}>
+          <Text style={styles.schedule}>{day}</Text>
+          <Text style={styles.schedule}>{time}</Text>
+        </View>
       </View>
     </TouchableOpacity>
   );
@@ -63,7 +64,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 6,
     paddingVertical: 2,
   },
-})
+});
 
 // import { colors } from '@/constants/colors';
 // import { typography } from '@/constants/typography';

@@ -6,29 +6,23 @@ import { Audio } from 'expo-av';
 import Constants from 'expo-constants';
 import { router } from 'expo-router';
 import React, { useEffect, useState } from 'react';
-import {
-  Alert,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View
-} from 'react-native';
+import { Alert, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
 type CurrentMissionUI = {
-  id: number;               // user_mission_id
+  id: number; // user_mission_id
   title: string;
   description: string;
   scheduledAt: string | null;
   listenable: boolean;
-  status: "IN_PROGRESS" | "COMPLETED";
+  status: 'IN_PROGRESS' | 'COMPLETED';
 };
 
 type WeeklyMissionItem = {
-  id: string;                 // 화면 key용 (문자열 권장)
-  serverMissionId: number;    // user_mission_id (API 호출용)
-  missionText: string;        // 카드에 표시할 텍스트 (title/description 중 택1)
-  scheduledDate: string;      // ISO or null이면 today 기준 등
-  completed: boolean;         // 성공 여부 (기록하기 버튼 활성화 조건)
+  id: string; // 화면 key용 (문자열 권장)
+  serverMissionId: number; // user_mission_id (API 호출용)
+  missionText: string; // 카드에 표시할 텍스트 (title/description 중 택1)
+  scheduledDate: string; // ISO or null이면 today 기준 등
+  completed: boolean; // 성공 여부 (기록하기 버튼 활성화 조건)
 };
 
 export default function WeeklyMission() {
@@ -84,9 +78,10 @@ export default function WeeklyMission() {
         setLoading(false);
       }
     })();
-    return () => { mounted = false; };
+    return () => {
+      mounted = false;
+    };
   }, []);
-
 
   const API_ORIGIN =
     (Constants.expoConfig?.extra?.API_BASE_URL as string) || 'https://junhong.shop';
@@ -99,22 +94,21 @@ export default function WeeklyMission() {
     const sep = u.startsWith('/') ? '' : '/';
     return `${API_ORIGIN}${sep}${u}`;
   };
-  
+
   const togglePlay = async (mission: WeeklyMissionItem) => {
     console.log('[미션듣기 버튼 누름]');
-    
 
     // if (!current) return;
 
     // 이미 재생 중이면 정지
     // 같은 카드 재생 중이면 정지
-  if (isPlaying === mission.id && sound) {
-    await sound.stopAsync();
-    await sound.unloadAsync();
-    setSound(null);
-    setIsPlaying(null);
-    return;
-  }
+    if (isPlaying === mission.id && sound) {
+      await sound.stopAsync();
+      await sound.unloadAsync();
+      setSound(null);
+      setIsPlaying(null);
+      return;
+    }
 
     setIsLoadingAudio(true);
     try {
@@ -139,13 +133,13 @@ export default function WeeklyMission() {
 
       const { sound: newSound } = await Audio.Sound.createAsync(
         { uri: absUrl },
-        { shouldPlay: true }
+        { shouldPlay: true },
       );
 
       setSound(newSound);
       setIsPlaying(mission.id);
 
-      newSound.setOnPlaybackStatusUpdate((s) => {
+      newSound.setOnPlaybackStatusUpdate(s => {
         if (!s.isLoaded) return;
         if (s.didJustFinish) {
           setIsPlaying(null);
@@ -164,62 +158,58 @@ export default function WeeklyMission() {
   const giveUpMission = (mission: WeeklyMissionItem) => {
     const dateText = formatDate(mission.scheduledDate);
 
-    Alert.alert(
-      '미션 포기',
-      `${dateText} 미션을 포기하시겠습니까?`,
-      [
-        { text: '취소', style: 'cancel' },
-        {
-          text: '포기하기',
-          style: 'destructive',
-          onPress: async () => {
-            try {
-              setGivingUpId(mission.id);
+    Alert.alert('미션 포기', `${dateText} 미션을 포기하시겠습니까?`, [
+      { text: '취소', style: 'cancel' },
+      {
+        text: '포기하기',
+        style: 'destructive',
+        onPress: async () => {
+          try {
+            setGivingUpId(mission.id);
 
-              // 토큰이 필요하면 2번째 인자로 전달: postGiveUpMission(mission.serverMissionId, token)
-              const res = await postGiveUpMission(mission.serverMissionId);
-              console.log('[포기 응답]', res);
+            // 토큰이 필요하면 2번째 인자로 전달: postGiveUpMission(mission.serverMissionId, token)
+            const res = await postGiveUpMission(mission.serverMissionId);
+            console.log('[포기 응답]', res);
 
-              // 성공 처리: 서버에서 최신 상태 다시 가져오기
-              const newResp = await getCurrentMission();
-              console.log('[포기 후 getCurrentMission 응답]', newResp);
+            // 성공 처리: 서버에서 최신 상태 다시 가져오기
+            const newResp = await getCurrentMission();
+            console.log('[포기 후 getCurrentMission 응답]', newResp);
 
-              if (newResp?.has_mission && newResp.mission) {
-                const m = newResp.mission;
-                const item: WeeklyMissionItem = {
-                  id: String(m.id),
-                  serverMissionId: m.id,
-                  missionText: m.title ?? m.description ?? '미션',
-                  scheduledDate: m.scheduled_at ?? new Date().toISOString(),
-                  completed: !!m.completed,
-                };
-                setWeeklyMissions([item]);
-              } else {
-                // has_mission이 false인 경우 빈 배열로 설정
-                console.log('[미션 없음 - 빈 배열 설정]');
-                setWeeklyMissions([]);
-                setCurrent(null);
-              }
-
-              Alert.alert('완료', '미션을 포기했습니다.');
-            } catch (e: any) {
-              const status = e?.response?.status;
-              if (status === 409) {
-                // 명세: 이미 완료된 현재 미션이면 409
-                Alert.alert('안내', '이미 완료된 미션입니다.');
-              } else if (status === 401 || status === 403) {
-                Alert.alert('안내', '로그인이 필요합니다.');
-              } else {
-                Alert.alert('오류', '미션 포기에 실패했습니다.');
-              }
-            } finally {
-              setGivingUpId(null);
+            if (newResp?.has_mission && newResp.mission) {
+              const m = newResp.mission;
+              const item: WeeklyMissionItem = {
+                id: String(m.id),
+                serverMissionId: m.id,
+                missionText: m.title ?? m.description ?? '미션',
+                scheduledDate: m.scheduled_at ?? new Date().toISOString(),
+                completed: !!m.completed,
+              };
+              setWeeklyMissions([item]);
+            } else {
+              // has_mission이 false인 경우 빈 배열로 설정
+              console.log('[미션 없음 - 빈 배열 설정]');
+              setWeeklyMissions([]);
+              setCurrent(null);
             }
+
+            Alert.alert('완료', '미션을 포기했습니다.');
+          } catch (e: any) {
+            const status = e?.response?.status;
+            if (status === 409) {
+              // 명세: 이미 완료된 현재 미션이면 409
+              Alert.alert('안내', '이미 완료된 미션입니다.');
+            } else if (status === 401 || status === 403) {
+              Alert.alert('안내', '로그인이 필요합니다.');
+            } else {
+              Alert.alert('오류', '미션 포기에 실패했습니다.');
+            }
+          } finally {
+            setGivingUpId(null);
           }
-        }
-      ]
-    );
-  }
+        },
+      },
+    ]);
+  };
 
   // 오늘 날짜 체크 함수
   const isToday = (dateString: string) => {
@@ -259,24 +249,18 @@ export default function WeeklyMission() {
 
   return (
     <View style={styles.container}>
-
       {weeklyMissions.length === 0 ? (
         <View style={styles.emptyCard}>
-          <Ionicons name="calendar-outline" size={48} color={colors.GRAY_400} />
+          <Ionicons name='calendar-outline' size={48} color={colors.GRAY_400} />
           <Text style={styles.emptyTitle}>이번주 미션이 없어요</Text>
-          <Text style={styles.emptyDescription}>
-            새로운 미션을 등록해주세요!
-          </Text>
-          <TouchableOpacity
-            style={styles.addButton}
-            onPress={() => router.push('/mission/select')}
-          >
+          <Text style={styles.emptyDescription}>새로운 미션을 등록해주세요!</Text>
+          <TouchableOpacity style={styles.addButton} onPress={() => router.push('/mission/select')}>
             <Text style={styles.addButtonText}>등록하기</Text>
           </TouchableOpacity>
         </View>
       ) : (
         <View style={styles.missionList}>
-          {weeklyMissions.map((mission) => {
+          {weeklyMissions.map(mission => {
             const isTodayMission = isToday(mission.scheduledDate);
             const isPastMission = isPast(mission.scheduledDate);
             const isFutureMission = isFuture(mission.scheduledDate);
@@ -284,10 +268,7 @@ export default function WeeklyMission() {
             return (
               <View
                 key={mission.id}
-                style={[
-                  styles.missionCard,
-                  isPastMission && styles.missionCardPast
-                ]}
+                style={[styles.missionCard, isPastMission && styles.missionCardPast]}
               >
                 <Text style={[typography.H4, styles.missionTitle]}>미션</Text>
 
@@ -299,18 +280,28 @@ export default function WeeklyMission() {
                         style={[
                           styles.playButton,
                           isPlaying === mission.id && styles.playButtonActive,
-                          isLoadingAudio && styles.playButtonDisabled
+                          isLoadingAudio && styles.playButtonDisabled,
                         ]}
                         onPress={() => togglePlay(mission)}
                         disabled={isLoadingAudio}
                       >
                         <Ionicons
-                          name={isPlaying === mission.id ? "stop" : isLoadingAudio ? "hourglass" : "headset"}
+                          name={
+                            isPlaying === mission.id
+                              ? 'stop'
+                              : isLoadingAudio
+                                ? 'hourglass'
+                                : 'headset'
+                          }
                           size={20}
                           color={colors.WHITE}
                         />
                         <Text style={[typography.B2_BOLD, styles.playButtonText]}>
-                          {isLoadingAudio ? '로딩...' : isPlaying === mission.id ? '정지' : '미션듣기'}
+                          {isLoadingAudio
+                            ? '로딩...'
+                            : isPlaying === mission.id
+                              ? '정지'
+                              : '미션듣기'}
                         </Text>
                       </TouchableOpacity>
 
@@ -322,14 +313,12 @@ export default function WeeklyMission() {
                             params: {
                               missionId: mission.serverMissionId,
                               scheduledDate: mission.scheduledDate,
-                            }
+                            },
                           });
                         }}
                       >
-                        <Ionicons name="pencil" size={16} color={colors.MAIN} />
-                        <Text style={[typography.B2_BOLD, styles.recordButtonText]}>
-                          기록하기
-                        </Text>
+                        <Ionicons name='pencil' size={16} color={colors.MAIN} />
+                        <Text style={[typography.B2_BOLD, styles.recordButtonText]}>기록하기</Text>
                       </TouchableOpacity>
                     </View>
 
@@ -347,14 +336,18 @@ export default function WeeklyMission() {
                         style={[
                           styles.playButton,
                           isPlaying === mission.id && styles.playButtonActive,
-                          isLoadingAudio && styles.playButtonDisabled
+                          isLoadingAudio && styles.playButtonDisabled,
                         ]}
                         onPress={() => togglePlay(mission)}
                         disabled={isLoadingAudio}
                       >
-                        <Ionicons name="headset" size={20} color={colors.WHITE} />
+                        <Ionicons name='headset' size={20} color={colors.WHITE} />
                         <Text style={[typography.B2_BOLD, styles.playButtonText]}>
-                          {isLoadingAudio ? '로딩...' : isPlaying === mission.id ? '정지' : '미션듣기'}
+                          {isLoadingAudio
+                            ? '로딩...'
+                            : isPlaying === mission.id
+                              ? '정지'
+                              : '미션듣기'}
                         </Text>
                       </TouchableOpacity>
                     </View>
@@ -369,10 +362,8 @@ export default function WeeklyMission() {
                 {isPastMission && (
                   <View style={styles.expiredDetailContainer}>
                     <View style={styles.expiredContainer}>
-                      <Ionicons name="time-outline" size={20} color={colors.GRAY_500} />
-                      <Text style={[typography.B2, styles.expiredText]}>
-                        기간이 지난 미션
-                      </Text>
+                      <Ionicons name='time-outline' size={20} color={colors.GRAY_500} />
+                      <Text style={[typography.B2, styles.expiredText]}>기간이 지난 미션</Text>
                     </View>
 
                     <Text style={[typography.C1, styles.pastDateText]}>
@@ -386,20 +377,24 @@ export default function WeeklyMission() {
                   style={[
                     styles.deleteButton,
                     isPastMission && styles.deleteButtonHighlighted,
-                    (givingUpId === mission.id || (isTodayMission && mission.completed)) && { opacity: 0.6 }
+                    (givingUpId === mission.id || (isTodayMission && mission.completed)) && {
+                      opacity: 0.6,
+                    },
                   ]}
                   onPress={() => giveUpMission(mission)}
                 >
                   <Ionicons
-                    name="close"
+                    name='close'
                     size={18}
                     color={isPastMission ? colors.ORANGE_600 : colors.GRAY_500}
                   />
-                  <Text style={[
-                    typography.C1,
-                    styles.deleteButtonText,
-                    isPastMission && styles.deleteButtonTextHighlighted
-                  ]}>
+                  <Text
+                    style={[
+                      typography.C1,
+                      styles.deleteButtonText,
+                      isPastMission && styles.deleteButtonTextHighlighted,
+                    ]}
+                  >
                     포기하기
                   </Text>
                 </TouchableOpacity>
@@ -469,10 +464,8 @@ const styles = StyleSheet.create({
   loadingText: {
     color: colors.GRAY_600,
   },
-  missionList: {
-  },
-  missionListContent: {
-  },
+  missionList: {},
+  missionListContent: {},
   missionCard: {
     backgroundColor: colors.WHITE,
     borderRadius: 12,

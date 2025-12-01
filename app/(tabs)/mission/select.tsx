@@ -24,25 +24,22 @@ export default function MissionSelectScreen() {
 
   // 미션 후보 목록 가져오기
   const fetchMissionCandidates = async () => {
-  setIsLoading(true);
-  try {
-    const response = await getMissionList();
+    setIsLoading(true);
+    try {
+      const response = await getMissionList();
 
-    const list =
-      Array.isArray(response)
-        ? response
-        : (response.list ?? []);
-    console.log(list);
+      const list = Array.isArray(response) ? response : (response.list ?? []);
+      console.log(list);
 
-    setMissions(list);
-    setSelectedMissionId(null);
-  } catch (error) {
-    console.error('미션 목록 로드 실패:', error);
-    Alert.alert('오류', '미션 목록을 불러오는데 실패했습니다.');
-  } finally {
-    setIsLoading(false);
-  }
-};
+      setMissions(list);
+      setSelectedMissionId(null);
+    } catch (error) {
+      console.error('미션 목록 로드 실패:', error);
+      Alert.alert('오류', '미션 목록을 불러오는데 실패했습니다.');
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   // 컴포넌트 마운트 시 미션 목록 로드
   useEffect(() => {
@@ -84,24 +81,20 @@ export default function MissionSelectScreen() {
 
   return (
     <View style={styles.container}>
-      <Header title="미션" />
+      <Header title='미션' />
 
       <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
-        <Text style={[typography.B1, styles.title]}>
-          미션을 선택해주세요!
-        </Text>
+        <Text style={[typography.B1, styles.title]}>미션을 선택해주세요!</Text>
 
         {isLoading ? (
           <View style={styles.loadingContainer}>
-            <ActivityIndicator size="large" color={colors.MAIN} />
-            <Text style={[typography.B2, styles.loadingText]}>
-              미션을 불러오는 중...
-            </Text>
+            <ActivityIndicator size='large' color={colors.MAIN} />
+            <Text style={[typography.B2, styles.loadingText]}>미션을 불러오는 중...</Text>
           </View>
         ) : (
           <>
             <View style={styles.missionList}>
-              {missions.map((mission) => (
+              {missions.map(mission => (
                 <TouchableOpacity
                   key={mission.id}
                   style={[
@@ -130,10 +123,8 @@ export default function MissionSelectScreen() {
               onPress={fetchMissionCandidates}
               disabled={isLoading || isSubmitting}
             >
-              <Text style={[typography.B2_BOLD, styles.moreButtonText]}>
-                다른 미션 보기
-              </Text>
-              <Ionicons name="refresh-outline" size={22} color={colors.GRAY_500} />
+              <Text style={[typography.B2_BOLD, styles.moreButtonText]}>다른 미션 보기</Text>
+              <Ionicons name='refresh-outline' size={22} color={colors.GRAY_500} />
             </TouchableOpacity>
           </>
         )}
@@ -149,7 +140,7 @@ export default function MissionSelectScreen() {
           disabled={selectedMissionId === null || isSubmitting}
         >
           {isSubmitting ? (
-            <ActivityIndicator size="small" color={colors.WHITE} />
+            <ActivityIndicator size='small' color={colors.WHITE} />
           ) : (
             <Text
               style={[

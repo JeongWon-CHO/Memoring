@@ -28,40 +28,49 @@ export default function HomeScreen() {
   // }, []);
 
   const handleNext = () => {
-    router.push({ pathname: '/mission' as any});
+    router.push({ pathname: '/mission' as any });
   };
 
   return (
     <SafeAreaView style={styles.container} edges={['top']}>
-      <ScrollView
-        style={styles.scrollView}
-        showsVerticalScrollIndicator={false}
-      >
+      <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
         {/* 헤더 */}
         <View style={styles.headerContainer}>
           <View style={styles.header}>
-            <Image source={require('../../assets/images/MEMORING_TEXT.png')} style={styles.memoryLogo} />
+            <Image
+              source={require('../../assets/images/MEMORING_TEXT.png')}
+              style={styles.memoryLogo}
+            />
           </View>
 
-          <Ionicons
-            name={"person-circle-outline"}
-            size={37}
-            color={colors.GRAY_800}
-          />
+          <Ionicons name={'person-circle-outline'} size={37} color={colors.GRAY_800} />
         </View>
-        
 
         <View style={styles.menu}>
           {/* 1. 미션 이동 컴포넌트 */}
-          <CardSection title='미션' content1='매주 미션을 통해' content2='목소리로 기억을 훈련해요!' onClick={handleNext} />
+          <CardSection
+            title='미션'
+            content1='매주 미션을 통해'
+            content2='목소리로 기억을 훈련해요!'
+            onClick={handleNext}
+          />
 
           {/* 2. 퀴즈 이동 컴포넌트 */}
-          <CardSection title='퀴즈' content1='매주 새로운 미션을 통해' content2='일상을 기록해 보아요!' onClick={handleNext} />
+          <CardSection
+            title='퀴즈'
+            content1='매주 새로운 미션을 통해'
+            content2='일상을 기록해 보아요!'
+            onClick={handleNext}
+          />
 
           {/* 4. 메모리 이동 컴포넌트 */}
-          <CardSection title='메모링' content1='미션을 완료 시 작성한 일기로' content2='일상을 기록하고 돌아보아요!' onClick={handleNext} />
+          <CardSection
+            title='메모링'
+            content1='미션을 완료 시 작성한 일기로'
+            content2='일상을 기록하고 돌아보아요!'
+            onClick={handleNext}
+          />
         </View>
-
 
         {/* ==================== 변경 전 UI ====================*/}
         {/* 사용자 인사말 */}
@@ -82,7 +91,6 @@ export default function HomeScreen() {
 
         {/* 4. 지난주 메모리 컴포넌트 */}
         {/* <LastWeekMemory /> */}
-        
 
         {/* 하단 여백 */}
         <View style={styles.bottomSpacing} />

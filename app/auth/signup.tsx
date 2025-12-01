@@ -4,8 +4,18 @@ import { colors } from '@/constants/colors';
 import { typography } from '@/constants/typography';
 import { router } from 'expo-router';
 import * as SecureStore from 'expo-secure-store';
-import { useState } from 'react';
-import { Alert, KeyboardAvoidingView, Platform, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import React, { useState } from 'react';
+import {
+  Alert,
+  KeyboardAvoidingView,
+  Platform,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
+} from 'react-native';
 
 export default function SignupScreen() {
   const [username, setUsername] = useState('');
@@ -67,10 +77,7 @@ export default function SignupScreen() {
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
     >
       <Header title='회원가입' />
-      <ScrollView
-        contentContainerStyle={styles.scrollContent}
-        showsVerticalScrollIndicator={false}
-      >
+      <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
         <View style={styles.header}>
           <Text style={[typography.S2, styles.title]}>본인확인을 위해 </Text>
           <Text style={[typography.S2, styles.title]}>기본 정보를 입력해 주세요.</Text>
@@ -81,11 +88,11 @@ export default function SignupScreen() {
             <Text style={[typography.B2_BOLD, styles.label]}>이름</Text>
             <TextInput
               style={styles.input}
-              placeholder="이름을 입력해 주세요."
+              placeholder='이름을 입력해 주세요.'
               placeholderTextColor={colors.GRAY_400}
               value={username}
               onChangeText={setUsername}
-              autoCapitalize="none"
+              autoCapitalize='none'
             />
           </View>
 
@@ -93,11 +100,11 @@ export default function SignupScreen() {
             <Text style={[typography.B2_BOLD, styles.label]}>아이디</Text>
             <TextInput
               style={styles.input}
-              placeholder="아이디를 입력해 주세요."
+              placeholder='아이디를 입력해 주세요.'
               placeholderTextColor={colors.GRAY_400}
               value={id}
               onChangeText={setId}
-              autoCapitalize="none"
+              autoCapitalize='none'
               autoCorrect={false}
             />
           </View>
@@ -106,12 +113,12 @@ export default function SignupScreen() {
             <Text style={[typography.B2_BOLD, styles.label]}>비밀번호</Text>
             <TextInput
               style={styles.input}
-              placeholder="비밀번호를 입력해 주세요."
+              placeholder='비밀번호를 입력해 주세요.'
               placeholderTextColor={colors.GRAY_400}
               value={password}
               onChangeText={setPassword}
               secureTextEntry
-              autoCapitalize="none"
+              autoCapitalize='none'
             />
           </View>
 
@@ -119,12 +126,12 @@ export default function SignupScreen() {
             <Text style={[typography.B2_BOLD, styles.label]}>비밀번호 확인</Text>
             <TextInput
               style={styles.input}
-              placeholder="비밀번호를 다시 입력해 주세요."
+              placeholder='비밀번호를 다시 입력해 주세요.'
               placeholderTextColor={colors.GRAY_400}
               value={passwordConfirm}
               onChangeText={setPasswordConfirm}
               secureTextEntry
-              autoCapitalize="none"
+              autoCapitalize='none'
             />
           </View>
         </View>
@@ -132,7 +139,8 @@ export default function SignupScreen() {
         <TouchableOpacity
           style={[
             styles.signupButton,
-            ((!username || !id || !password || !passwordConfirm) || isLoading) && styles.disabledButton,
+            (!username || !id || !password || !passwordConfirm || isLoading) &&
+              styles.disabledButton,
           ]}
           onPress={handleSignup}
           disabled={!username || !id || !password || !passwordConfirm || isLoading}
@@ -158,9 +166,7 @@ const styles = StyleSheet.create({
   header: {
     marginBottom: 40,
   },
-  title: {
-    
-  },
+  title: {},
   form: {
     marginBottom: 30,
   },

@@ -5,13 +5,7 @@ import { typography } from '@/constants/typography';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { router, useLocalSearchParams } from 'expo-router';
 import React, { useState } from 'react';
-import {
-  ScrollView,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
-} from 'react-native';
+import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { ScrollView as GestureScrollView } from 'react-native-gesture-handler';
 import { patchMissionSchedule } from '../../../api/mission';
 
@@ -46,7 +40,7 @@ export default function MissionScheduleScreen() {
     const mm = pad(d.getMinutes());
     const ss = pad(d.getSeconds());
 
-    const offsetMin = -d.getTimezoneOffset();      // e.g. KST = +540
+    const offsetMin = -d.getTimezoneOffset(); // e.g. KST = +540
     const sign = offsetMin >= 0 ? '+' : '-';
     const oh = pad(Math.floor(Math.abs(offsetMin) / 60));
     const om = pad(Math.abs(offsetMin) % 60);
@@ -55,7 +49,7 @@ export default function MissionScheduleScreen() {
   };
 
   const alarmOffsetMap: Record<string, number> = {
-    '정시': 0,
+    정시: 0,
     '5분 전': 5,
     '10분 전': 10,
     '15분 전': 15,
@@ -63,14 +57,7 @@ export default function MissionScheduleScreen() {
     '1시간 전': 60,
   };
 
-  const notificationOptions = [
-    '정시',
-    '5분 전',
-    '10분 전',
-    '15분 전',
-    '30분 전',
-    '1시간 전',
-  ];
+  const notificationOptions = ['정시', '5분 전', '10분 전', '15분 전', '30분 전', '1시간 전'];
 
   // 이번 주 날짜 계산
   const getWeekDates = () => {
@@ -126,14 +113,11 @@ export default function MissionScheduleScreen() {
 
   return (
     <View style={styles.container}>
-      <Header title="녹음" />
+      <Header title='녹음' />
 
       <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
         {/* 미션 텍스트 표시 */}
-        <MissionCard
-          missionText={missionText as string}
-          dayTime={{ day: '', time: '' }}
-        />
+        <MissionCard missionText={missionText as string} dayTime={{ day: '', time: '' }} />
 
         {/* 날짜 선택 */}
         <View style={styles.section}>
@@ -199,7 +183,7 @@ export default function MissionScheduleScreen() {
 
               {isHourDropdownOpen && (
                 <GestureScrollView style={styles.dropdownList} nestedScrollEnabled>
-                  {Array.from({ length: 24 }, (_, i) => i).map((hour) => (
+                  {Array.from({ length: 24 }, (_, i) => i).map(hour => (
                     <TouchableOpacity
                       key={hour}
                       style={styles.dropdownItem}
@@ -238,7 +222,7 @@ export default function MissionScheduleScreen() {
 
               {isMinuteDropdownOpen && (
                 <GestureScrollView style={styles.dropdownList} nestedScrollEnabled>
-                  {Array.from({ length: 60 }, (_, i) => i).map((minute) => (
+                  {Array.from({ length: 60 }, (_, i) => i).map(minute => (
                     <TouchableOpacity
                       key={minute}
                       style={styles.dropdownItem}
@@ -265,9 +249,7 @@ export default function MissionScheduleScreen() {
             style={styles.notificationDropdown}
             onPress={() => setIsNotificationDropdownOpen(!isNotificationDropdownOpen)}
           >
-            <Text style={[typography.B2, styles.notificationText]}>
-              {notificationTime}
-            </Text>
+            <Text style={[typography.B2, styles.notificationText]}>{notificationTime}</Text>
             <Ionicons
               name={isNotificationDropdownOpen ? 'chevron-up' : 'chevron-down'}
               size={20}
@@ -277,7 +259,7 @@ export default function MissionScheduleScreen() {
 
           {isNotificationDropdownOpen && (
             <View style={styles.notificationDropdownList}>
-              {notificationOptions.map((option) => (
+              {notificationOptions.map(option => (
                 <TouchableOpacity
                   key={option}
                   style={styles.dropdownItem}
@@ -286,9 +268,7 @@ export default function MissionScheduleScreen() {
                     setIsNotificationDropdownOpen(false);
                   }}
                 >
-                  <Text style={[typography.B2, styles.dropdownItemText]}>
-                    {option}
-                  </Text>
+                  <Text style={[typography.B2, styles.dropdownItemText]}>{option}</Text>
                 </TouchableOpacity>
               ))}
             </View>
@@ -299,9 +279,7 @@ export default function MissionScheduleScreen() {
       {/* 다음 버튼 */}
       <View style={styles.bottomContainer}>
         <TouchableOpacity style={styles.nextButton} onPress={handleNext}>
-          <Text style={[typography.B1_BOLD, styles.nextButtonText]}>
-            다음
-          </Text>
+          <Text style={[typography.B1_BOLD, styles.nextButtonText]}>다음</Text>
         </TouchableOpacity>
       </View>
     </View>

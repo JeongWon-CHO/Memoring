@@ -15,7 +15,7 @@ import {
   TextInput,
   TouchableOpacity,
   TouchableWithoutFeedback,
-  View
+  View,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useLogin } from '../../hooks/useLogin';
@@ -36,7 +36,7 @@ export default function LoginScreen() {
   const [isLoading, setIsLoading] = useState(false);
 
   const login = useLogin();
-  
+
   const handleLogin = async () => {
     if (!id || !password) {
       Alert.alert('알림', '아이디와 비밀번호를 입력해주세요.');
@@ -88,7 +88,7 @@ export default function LoginScreen() {
     <SafeAreaView style={styles.container}>
       <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
         <KeyboardAvoidingView
-          behavior={Platform.OS === "ios" ? "padding" : "height"}
+          behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
           style={styles.keyboardView}
         >
           <View style={styles.content}>
@@ -102,11 +102,11 @@ export default function LoginScreen() {
               <View style={styles.inputContainer}>
                 <TextInput
                   style={styles.input}
-                  placeholder="아이디 입력"
+                  placeholder='아이디 입력'
                   placeholderTextColor={colors.GRAY_500}
                   value={id}
                   onChangeText={setId}
-                  autoCapitalize="none"
+                  autoCapitalize='none'
                 />
               </View>
 
@@ -114,7 +114,7 @@ export default function LoginScreen() {
                 <View style={styles.passwordInputWrapper}>
                   <TextInput
                     style={styles.passwordInput}
-                    placeholder="비밀번호 입력"
+                    placeholder='비밀번호 입력'
                     placeholderTextColor={colors.GRAY_500}
                     value={password}
                     onChangeText={setPassword}
@@ -140,9 +140,7 @@ export default function LoginScreen() {
                 activeOpacity={0.7}
               >
                 <View style={[styles.checkbox, autoLogin && styles.checkboxChecked]}>
-                  {autoLogin && (
-                    <Ionicons name="checkmark" size={16} color={colors.WHITE} />
-                  )}
+                  {autoLogin && <Ionicons name='checkmark' size={16} color={colors.WHITE} />}
                 </View>
                 <Text style={styles.autoLoginText}>자동 로그인하기</Text>
               </TouchableOpacity>

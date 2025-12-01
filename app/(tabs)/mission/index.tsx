@@ -1,10 +1,10 @@
-import { getUserMe } from "@/api/auth";
-import MissionCard from "@/components/mission/MissionCard";
-import { colors } from "@/constants/colors";
-import { typography } from "@/constants/typography";
+import { getUserMe } from '@/api/auth';
+import MissionCard from '@/components/mission/MissionCard';
+import { colors } from '@/constants/colors';
+import { typography } from '@/constants/typography';
 import Entypo from '@expo/vector-icons/Entypo';
-import { useEffect, useState } from "react";
-import { Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import React, { useEffect, useState } from 'react';
+import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 export default function MissionHome() {
@@ -25,14 +25,19 @@ export default function MissionHome() {
         if (mounted) setLoadingUser(false);
       }
     })();
-    return () => { mounted = false; };
+    return () => {
+      mounted = false;
+    };
   }, []);
-  
+
   return (
     <SafeAreaView style={styles.container} edges={['top']}>
       {/* 헤더 */}
       <View style={styles.header}>
-        <Image source={require('../../../assets/images/MEMORING_TEXT.png')} style={styles.memoryLogo} />
+        <Image
+          source={require('../../../assets/images/MEMORING_TEXT.png')}
+          style={styles.memoryLogo}
+        />
       </View>
 
       {/* 인삿말 */}
@@ -40,19 +45,22 @@ export default function MissionHome() {
         <Text style={styles.greetingText}>
           <Text style={[typography.S1, styles.userName]}>{userName}님</Text>
         </Text>
-        <Text style={styles.greetingSubText}>
-          오늘 하루도 기록해 볼까요!
-        </Text>
+        <Text style={styles.greetingSubText}>오늘 하루도 기록해 볼까요!</Text>
       </View>
 
       {/* 선택된 미션 리스트 */}
-      <TouchableOpacity  style={styles.weeklyContainer} onPress={() => {}}>
-          <Entypo name="plus" size={24} color={colors.GRAY_500} />
-          <Text style={styles.text}>이번 주 미션 리스트에서 추가하기</Text>
+      <TouchableOpacity style={styles.weeklyContainer} onPress={() => {}}>
+        <Entypo name='plus' size={24} color={colors.GRAY_500} />
+        <Text style={styles.text}>이번 주 미션 리스트에서 추가하기</Text>
       </TouchableOpacity>
 
       {/* 미션 리스트 */}
-      <MissionCard content="베란다에 나가 5분 동안 하늘을 바라보며 오늘의 기분을 종이에 한 줄로 적기" day="목요일" time="오후1시" imgURL={'asdf'} />
+      <MissionCard
+        content='베란다에 나가 5분 동안 하늘을 바라보며 오늘의 기분을 종이에 한 줄로 적기'
+        day='목요일'
+        time='오후1시'
+        imgURL={'asdf'}
+      />
     </SafeAreaView>
   );
 }

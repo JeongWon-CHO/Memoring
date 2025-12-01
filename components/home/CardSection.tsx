@@ -1,6 +1,7 @@
 import { colors } from '@/constants/colors';
 import Feather from '@expo/vector-icons/Feather';
-import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import React from 'react';
+import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
 interface CardSectionProps {
   title: string;
@@ -10,12 +11,11 @@ interface CardSectionProps {
 }
 
 export default function CardSection({ title, content1, content2, onClick }: CardSectionProps) {
-
   return (
-    <TouchableOpacity  style={styles.container} onPress={onClick}>
+    <TouchableOpacity style={styles.container} onPress={onClick}>
       <View style={styles.titleContainer}>
         <Text style={styles.title}>{title}</Text>
-        <Feather name="arrow-right" size={24} color="black" />
+        <Feather name='arrow-right' size={24} color='black' />
       </View>
 
       <View style={styles.content}>
@@ -23,7 +23,6 @@ export default function CardSection({ title, content1, content2, onClick }: Card
         <Text style={styles.contentDetail}>{content2}</Text>
       </View>
     </TouchableOpacity>
-    
   );
 }
 
@@ -31,7 +30,7 @@ const styles = StyleSheet.create({
   container: {
     gap: 14,
     padding: 32,
-    marginHorizontal:20,
+    marginHorizontal: 20,
     backgroundColor: 'white',
     borderRadius: 16,
     shadowColor: '#000',

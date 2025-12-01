@@ -6,13 +6,7 @@ import Ionicons from '@expo/vector-icons/Ionicons';
 import { Audio } from 'expo-av';
 import { router, useLocalSearchParams } from 'expo-router';
 import React, { useEffect, useRef, useState } from 'react';
-import {
-  Alert,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View
-} from 'react-native';
+import { Alert, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { getPlayRecord, postUploadRecord } from '../../../api/mission';
 
 export default function MissionRecordScreen() {
@@ -33,7 +27,7 @@ export default function MissionRecordScreen() {
   // const [serverVoiceUrl, setServerVoiceUrl] = useState<string | null>(null);
   // const [sound, setSound] = useState<Audio.Sound | null>(null);
   // const [isUploading, setIsUploading] = useState(false);
-  
+
   // const [recording, setRecording] = useState<Audio.Recording | null>(null);
   const [isRecording, setIsRecording] = useState(false);
   const [isPaused, setIsPaused] = useState(false);
@@ -43,29 +37,28 @@ export default function MissionRecordScreen() {
   const [serverVoiceUrl, setServerVoiceUrl] = useState<string | null>(null);
 
   useEffect(() => {
-      (async () => {
-        const { status } = await Audio.requestPermissionsAsync();
-        if (status !== "granted") {
-          Alert.alert("마이크 권한이 필요합니다.");
-        }
-        await Audio.setAudioModeAsync({
-          allowsRecordingIOS: true,
-          playsInSilentModeIOS: true,
-        });
-  
-        // 서버에서 기존 녹음 파일 URL 가져오기
-        try {
-          const response = await getPlayRecord(serverMissionIdNum);
-          if (response.voice_url) {
-            setServerVoiceUrl(response.voice_url);
-          }
-        } catch (error) {
-          console.log("기존 녹음이 없습니다.");
-        }
-      })();
-    }, []);
+    (async () => {
+      const { status } = await Audio.requestPermissionsAsync();
+      if (status !== 'granted') {
+        Alert.alert('마이크 권한이 필요합니다.');
+      }
+      await Audio.setAudioModeAsync({
+        allowsRecordingIOS: true,
+        playsInSilentModeIOS: true,
+      });
 
-  
+      // 서버에서 기존 녹음 파일 URL 가져오기
+      try {
+        const response = await getPlayRecord(serverMissionIdNum);
+        if (response.voice_url) {
+          setServerVoiceUrl(response.voice_url);
+        }
+      } catch (error) {
+        console.log('기존 녹음이 없습니다.');
+      }
+    })();
+  }, []);
+
   // 타이머 시작
   const startTimer = () => {
     if (timerRef.current) clearInterval(timerRef.current);
@@ -116,7 +109,7 @@ export default function MissionRecordScreen() {
       });
 
       const { recording: rec } = await Audio.Recording.createAsync(
-        Audio.RecordingOptionsPresets.HIGH_QUALITY
+        Audio.RecordingOptionsPresets.HIGH_QUALITY,
       );
 
       setRecording(rec);
@@ -125,7 +118,7 @@ export default function MissionRecordScreen() {
       setSeconds(0);
       startTimer();
     } catch (err) {
-      console.error("녹음 시작 실패", err);
+      console.error('녹음 시작 실패', err);
     }
   };
 
@@ -154,40 +147,42 @@ export default function MissionRecordScreen() {
     setIsPaused(false);
     setIsRecording(false);
     if (recording) {
-      try { await recording.stopAndUnloadAsync(); } catch {}
+      try {
+        await recording.stopAndUnloadAsync();
+      } catch {}
     }
     setRecording(null);
   };
 
   // 녹음 중지 및 서버에 업로드
   const stopRecording = async () => {
-    console.log("녹음 중지");
+    console.log('녹음 중지');
     if (!recording) return;
 
     try {
-    await recording.stopAndUnloadAsync();
-    stopTimer();
+      await recording.stopAndUnloadAsync();
+      stopTimer();
 
-    const cacheUri = recording.getURI();
-    if (!cacheUri) throw new Error('녹음 파일 경로를 찾을 수 없어요.');
+      const cacheUri = recording.getURI();
+      if (!cacheUri) throw new Error('녹음 파일 경로를 찾을 수 없어요.');
 
-    const res = await postUploadRecord(serverMissionIdNum, cacheUri);
-    if (res?.voice_url) {
-      setServerVoiceUrl(res.voice_url);
-      Alert.alert('성공', '녹음이 성공적으로 업로드되었습니다.');
+      const res = await postUploadRecord(serverMissionIdNum, cacheUri);
+      if (res?.voice_url) {
+        setServerVoiceUrl(res.voice_url);
+        Alert.alert('성공', '녹음이 성공적으로 업로드되었습니다.');
+      }
+      router.push({
+        pathname: '/', // 실제 녹음 화면 경로
+      });
+    } catch (e) {
+      console.error('업로드 실패', e);
+      Alert.alert('오류', '녹음 업로드에 실패했습니다.');
+    } finally {
+      setIsSaving(false);
+      setIsRecording(false);
+      setIsPaused(false);
+      setRecording(null);
     }
-    router.push({
-      pathname: '/', // 실제 녹음 화면 경로
-    });
-  } catch (e) {
-    console.error('업로드 실패', e);
-    Alert.alert('오류', '녹음 업로드에 실패했습니다.');
-  } finally {
-    setIsSaving(false);
-    setIsRecording(false);
-    setIsPaused(false);
-    setRecording(null);
-  }
     // setIsUploading(true);
     // await recording.stopAndUnloadAsync();
     // const cacheUri = recording.getURI();
@@ -235,7 +230,7 @@ export default function MissionRecordScreen() {
 
   return (
     <View style={styles.container}>
-      <Header title="녹음" />
+      <Header title='녹음' />
 
       <View style={styles.content}>
         {/* 미션 텍스트 */}
@@ -256,15 +251,15 @@ export default function MissionRecordScreen() {
           >
             {!isRecording ? (
               <>
-                <Ionicons name="mic" size={32} color={colors.MAIN} />
+                <Ionicons name='mic' size={32} color={colors.MAIN} />
                 <Text style={[typography.B2_BOLD, styles.recordButtonText]}>녹음하기</Text>
               </>
             ) : (
               <>
                 {isPaused ? (
-                  <Ionicons name="play" size={32} color={colors.MAIN} />
+                  <Ionicons name='play' size={32} color={colors.MAIN} />
                 ) : (
-                  <Ionicons name="pause" size={32} color={colors.MAIN} />
+                  <Ionicons name='pause' size={32} color={colors.MAIN} />
                 )}
                 <Text style={[typography.B2_BOLD, styles.recordButtonText]}>
                   {isPaused ? '재개하기' : '일시정지'}
@@ -275,22 +270,15 @@ export default function MissionRecordScreen() {
 
           {/* 하단 안내 텍스트 */}
           {!isRecording && (
-            <Text style={[typography.C1, styles.hintText]}>
-              본인 목소리로 녹음해주세요
-            </Text>
+            <Text style={[typography.C1, styles.hintText]}>본인 목소리로 녹음해주세요</Text>
           )}
         </View>
 
         {/* 하단 버튼들 */}
         {isRecording && (
           <View style={styles.bottomButtons}>
-            <TouchableOpacity
-              style={styles.secondaryButton}
-              onPress={resetRecording}
-            >
-              <Text style={[typography.B1_BOLD, styles.secondaryButtonText]}>
-                다시녹음
-              </Text>
+            <TouchableOpacity style={styles.secondaryButton} onPress={resetRecording}>
+              <Text style={[typography.B1_BOLD, styles.secondaryButtonText]}>다시녹음</Text>
             </TouchableOpacity>
 
             <TouchableOpacity
@@ -298,7 +286,7 @@ export default function MissionRecordScreen() {
               onPress={stopRecording}
               disabled={isSaving}
             >
-              <Ionicons name="download-outline" size={20} color={colors.WHITE} />
+              <Ionicons name='download-outline' size={20} color={colors.WHITE} />
               <Text style={[typography.B1_BOLD, styles.primaryButtonText]}>
                 {isSaving ? '저장 중...' : '저장하기'}
               </Text>

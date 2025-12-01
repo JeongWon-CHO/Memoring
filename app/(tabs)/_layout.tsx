@@ -9,37 +9,31 @@ export default function TabLayout() {
       screenOptions={{
         tabBarActiveTintColor: colors.MAIN,
         headerShown: false,
-      }}>
+      }}
+    >
       <Tabs.Screen
-        name="index"
+        name='index'
         options={{
           title: '홈',
           tabBarIcon: ({ color, focused }) => (
+            <Ionicons name={focused ? 'home-sharp' : 'home-outline'} size={25} color={color} />
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name='my'
+        options={{
+          title: '내정보',
+          tabBarIcon: ({ color, focused }) => (
             <Ionicons
-              name={focused ? "home-sharp" : "home-outline"}
+              name={focused ? 'person-circle' : 'person-circle-outline'}
               size={25}
               color={color}
             />
           ),
         }}
       />
-      <Tabs.Screen
-        name="my"
-        options={{
-          title: '내정보',
-          tabBarIcon: ({ color, focused }) => (
-            <Ionicons
-              name={focused ? "person-circle" : "person-circle-outline"}
-              size={25}
-              color={color}
-            />
-          )
-        }}
-      />
-      <Tabs.Screen
-        name="mission"
-        options={{ href: null }}
-      />
+      <Tabs.Screen name='mission' options={{ href: null }} />
     </Tabs>
   );
 }

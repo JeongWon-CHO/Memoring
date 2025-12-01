@@ -2,7 +2,15 @@ import Header from '@/components/common/Header';
 import { colors } from '@/constants/colors';
 import { typography } from '@/constants/typography';
 import React, { useState } from 'react';
-import { Dimensions, Image, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import {
+  Dimensions,
+  Image,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 const { width } = Dimensions.get('window');
@@ -25,8 +33,9 @@ const memoryData: MemoryItem[] = [
     time: '오전 10시',
     title: '투유원 오전 10시에 집 주변에서\n15분간 산책하며 마음에 드는 꽃 사진 찍기',
     location: '',
-    description: '오늘 아침에 동네 한 바퀴를 천천히 걷다가 골목 모퉁이에서 주황빛 능소화를 발견했어. 햇살에 비쳐서 너무 아름답더라. 아직 여름이라 더워도 이렇게 보면 행복하다.',
-    image: require('@/assets/images/mission1.jpg')
+    description:
+      '오늘 아침에 동네 한 바퀴를 천천히 걷다가 골목 모퉁이에서 주황빛 능소화를 발견했어. 햇살에 비쳐서 너무 아름답더라. 아직 여름이라 더워도 이렇게 보면 행복하다.',
+    image: require('@/assets/images/mission1.jpg'),
   },
   {
     id: '2',
@@ -34,9 +43,10 @@ const memoryData: MemoryItem[] = [
     time: '오후 1시',
     title: '금요일 오후 1시 집 근처\n전통시장에 가서 사진 찍기',
     location: '',
-    description: '날씨가 더워서 점심을 밖에서 먹고 있자 왔고 시장도 둘러봤어. 오랜만에 시장들로 목적이는 풍경을 보니까 동터. 심싶했더 배추랑 무도 보고',
-    image: require('@/assets/images/mission2.jpg')
-  }
+    description:
+      '날씨가 더워서 점심을 밖에서 먹고 있자 왔고 시장도 둘러봤어. 오랜만에 시장들로 목적이는 풍경을 보니까 동터. 심싶했더 배추랑 무도 보고',
+    image: require('@/assets/images/mission2.jpg'),
+  },
 ];
 
 export default function MemoryScreen() {
@@ -52,7 +62,7 @@ export default function MemoryScreen() {
         </View>
 
         <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
-          {memoryData.map((item) => (
+          {memoryData.map(item => (
             <View key={item.id} style={styles.memoryCard}>
               <View style={styles.dateHeader}>
                 <Text style={styles.dateText}>{item.date}</Text>
@@ -62,15 +72,11 @@ export default function MemoryScreen() {
                 <Text style={styles.titleText}>
                   {item.time} {item.title.split('\n')[0]}
                 </Text>
-                <Text style={styles.subtitleText}>
-                  {item.title.split('\n')[1]}
-                </Text>
+                <Text style={styles.subtitleText}>{item.title.split('\n')[1]}</Text>
 
-                <Image source={item.image} style={styles.memoryImage} resizeMode="cover" />
+                <Image source={item.image} style={styles.memoryImage} resizeMode='cover' />
 
-                <Text style={styles.descriptionText}>
-                  {item.description}
-                </Text>
+                <Text style={styles.descriptionText}>{item.description}</Text>
 
                 <TouchableOpacity style={styles.moreButton}>
                   <Text style={styles.moreButtonText}>더보기 &gt;</Text>

@@ -2,7 +2,7 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { Stack } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Image, StyleSheet, View } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import 'react-native-reanimated';
@@ -51,11 +51,11 @@ export default function RootLayout() {
     <GestureHandlerRootView style={{ flex: 1 }}>
       <SafeAreaProvider>
         <QueryClientProvider client={queryClient}>
-          <Stack initialRouteName="auth">
-            <Stack.Screen name="auth" options={{ headerShown: false }}  />
-            <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-            <Stack.Screen name="mission" options={{ headerShown: false }} />
-            <Stack.Screen name="+not-found" />
+          <Stack initialRouteName='auth'>
+            <Stack.Screen name='auth' options={{ headerShown: false }} />
+            <Stack.Screen name='(tabs)' options={{ headerShown: false }} />
+            <Stack.Screen name='mission' options={{ headerShown: false }} />
+            <Stack.Screen name='+not-found' />
           </Stack>
           <Toast />
         </QueryClientProvider>
