@@ -17,7 +17,7 @@ module.exports = {
 	 * @template: useTabs: <bool>
 	 * @description: 탭 사용 여부 (미사용 시 스페이스바로 간격조정을 해야함.)
 	 */
-	useTabs: true,
+	useTabs: false,
 
 	/**
 	 * @template: semi: <bool>
