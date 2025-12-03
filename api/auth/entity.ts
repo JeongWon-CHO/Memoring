@@ -1,4 +1,4 @@
-import { APIResponse } from "../APIResponse";
+import { APIResponse } from '../APIResponse';
 
 export type Emotion = 'HAPPY' | 'SAD' | 'ANGRY' | 'NEUTRAL';
 export type Role = 'USER' | 'ADMIN';
@@ -16,7 +16,7 @@ export interface SignUpResponse extends APIResponse {
 
 export interface SignUpRequest {
   nickname: string;
-  userName: string;
+  username: string;
   password: string;
   passwordConfirm: string;
 }
@@ -31,7 +31,7 @@ export interface LoginResponse extends APIResponse {
 }
 
 export interface LoginRequest {
-  username: string;  // userId
+  username: string; // userId
   password: string;
 }
 
@@ -47,7 +47,6 @@ export interface RefreshResponse extends APIResponse {
 export interface RefreshRequest {
   refreshToken: string;
 }
-
 
 // 변경된 현재 사용자 정보 조회
 export interface UserInfoResponse extends APIResponse {

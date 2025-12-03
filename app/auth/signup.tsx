@@ -3,7 +3,6 @@ import Header from '@/components/common/Header';
 import { colors } from '@/constants/colors';
 import { typography } from '@/constants/typography';
 import { router } from 'expo-router';
-import * as SecureStore from 'expo-secure-store';
 import React, { useState } from 'react';
 import {
   Alert,
@@ -18,15 +17,15 @@ import {
 } from 'react-native';
 
 export default function SignupScreen() {
+  const [nickname, setNickname] = useState('');
   const [username, setUsername] = useState('');
-  const [id, setId] = useState('');
   const [password, setPassword] = useState('');
   const [passwordConfirm, setPasswordConfirm] = useState('');
   const [isLoading, setIsLoading] = useState(false);
 
   const handleSignup = async () => {
     // Basic validation
-    if (!username || !id || !password || !passwordConfirm) {
+    if (!nickname || !username || !password || !passwordConfirm) {
       Alert.alert('알림', '모든 정보를 입력해주세요.');
       return;
     }
@@ -40,16 +39,17 @@ export default function SignupScreen() {
 
     try {
       const response = await postSignup({
+        nickname,
         username,
-        id,
         password,
-        password_confirm: passwordConfirm,
+        passwordConfirm: passwordConfirm,
       });
 
       // 토큰 저장
-      if (response.token) {
-        await SecureStore.setItemAsync('authToken', response.token);
-      }
+      // if (response.accessToken && response.refreshToken) {
+      //   await SecureStore.setItemAsync('authToken', response.accessToken);
+      //   await SecureStore.setItemAsync('refreshToken', response.refreshToken);
+      // }
 
       Alert.alert('회원가입 완료', '회원가입이 완료되었습니다.', [
         {
@@ -57,6 +57,7 @@ export default function SignupScreen() {
           onPress: () => router.replace('/auth/login'),
         },
       ]);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
       console.error('Signup error:', error);
       if (error.status === 409) {
@@ -90,8 +91,8 @@ export default function SignupScreen() {
               style={styles.input}
               placeholder='이름을 입력해 주세요.'
               placeholderTextColor={colors.GRAY_400}
-              value={username}
-              onChangeText={setUsername}
+              value={nickname}
+              onChangeText={setNickname}
               autoCapitalize='none'
             />
           </View>
@@ -102,8 +103,8 @@ export default function SignupScreen() {
               style={styles.input}
               placeholder='아이디를 입력해 주세요.'
               placeholderTextColor={colors.GRAY_400}
-              value={id}
-              onChangeText={setId}
+              value={username}
+              onChangeText={setUsername}
               autoCapitalize='none'
               autoCorrect={false}
             />
@@ -139,11 +140,11 @@ export default function SignupScreen() {
         <TouchableOpacity
           style={[
             styles.signupButton,
-            (!username || !id || !password || !passwordConfirm || isLoading) &&
+            (!nickname || !username || !password || !passwordConfirm || isLoading) &&
               styles.disabledButton,
           ]}
           onPress={handleSignup}
-          disabled={!username || !id || !password || !passwordConfirm || isLoading}
+          disabled={!nickname || !username || !password || !passwordConfirm || isLoading}
         >
           <Text style={styles.signupButtonText}>{isLoading ? '처리 중...' : '가입 완료'}</Text>
         </TouchableOpacity>

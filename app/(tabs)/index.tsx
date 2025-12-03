@@ -2,14 +2,11 @@ import CardSection from '@/components/home/CardSection';
 import { colors } from '@/constants/colors';
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
-import React, { useState } from 'react';
+import React from 'react';
 import { Image, ScrollView, StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 export default function HomeScreen() {
-  const [userName, setUserName] = useState<string>('');
-  const [loadingUser, setLoadingUser] = useState<boolean>(true);
-
   // useEffect(() => {
   //   let mounted = true;
   //   (async () => {
@@ -28,6 +25,7 @@ export default function HomeScreen() {
   // }, []);
 
   const handleNext = () => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     router.push({ pathname: '/mission' as any });
   };
 

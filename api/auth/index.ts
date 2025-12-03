@@ -1,11 +1,5 @@
 import APIClient from '../apiClient';
-import {
-  GetUserInfo,
-  PostLogin,
-  PostLogout,
-  PostRefresh,
-  PostSignUp,
-} from './APIDetail';
+import { GetUserInfo, PostLogin, PostLogout, PostRefresh, PostSignUp } from './APIDetail';
 
 // 회원가입
 export const postSignup = APIClient.of(PostSignUp);

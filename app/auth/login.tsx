@@ -45,10 +45,6 @@ export default function LoginScreen() {
 
     setIsLoading(true);
 
-    // router.replace('/(tabs)');
-
-    // setIsLoading(false);
-
     try {
       await login({
         loginId: id,
@@ -63,6 +59,7 @@ export default function LoginScreen() {
 
       // 로그인 성공 시 메인 화면으로 이동
       router.replace('/');
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
       console.error('Login error:', error);
       if (error.status === 401) {

@@ -1,6 +1,14 @@
-import { APIRequest, HTTP_METHOD } from "../APIRequest";
-import { APIResponse } from "../APIResponse";
-import { LoginRequest, LoginResponse, RefreshRequest, RefreshResponse, SignUpResponse, UserInfoResponse } from "./entity";
+import { APIRequest, HTTP_METHOD } from '../APIRequest';
+import { APIResponse } from '../APIResponse';
+import {
+  LoginRequest,
+  LoginResponse,
+  RefreshRequest,
+  RefreshResponse,
+  SignUpRequest,
+  SignUpResponse,
+  UserInfoResponse,
+} from './entity';
 
 // POST /user/signup/ (회원가입)
 export class PostSignUp<R extends SignUpResponse> implements APIRequest<R> {
@@ -8,6 +16,8 @@ export class PostSignUp<R extends SignUpResponse> implements APIRequest<R> {
   path = 'api/v1/user/signup';
   response!: R;
   auth = false;
+
+  constructor(public data: SignUpRequest) { }
 }
 
 // POST  api/v1/user/login (로그인)
@@ -17,16 +27,13 @@ export class PostLogin implements APIRequest<LoginResponse> {
   response!: LoginResponse;
   auth = false;
 
-  // constructor(public data: LoginRequest) { }
-  constructor(public data: LoginRequest) {
-    console.log("🚨 RN LOGIN REQUEST DATA:", data);
-  }
+  constructor(public data: LoginRequest) { }
 }
 
 // POST  api/v1/user/logout (로그아웃)
 export class PostLogout<R extends APIResponse> implements APIRequest<R> {
   method = HTTP_METHOD.POST;
-  path = 'api/v1/user/logout';     // 끝에 슬래시 유지
+  path = 'api/v1/user/logout'; // 끝에 슬래시 유지
   response!: R;
   auth = true;
   authorization?: string;

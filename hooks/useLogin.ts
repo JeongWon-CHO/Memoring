@@ -17,7 +17,7 @@ export const useLogin = () => {
 
   const mutation = useMutation({
     mutationFn: postLogin,
-    onSuccess: async (data) => {
+    onSuccess: async data => {
       await SecureStore.setItemAsync('authToken', data.accessToken);
       await SecureStore.setItemAsync('refreshToken', data.refreshToken);
 
